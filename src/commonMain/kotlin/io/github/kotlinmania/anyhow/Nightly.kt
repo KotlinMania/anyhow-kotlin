@@ -6,7 +6,7 @@ package io.github.kotlinmania.anyhow
  * generic member access API (notably backtrace provisioning).
  *
  * Kotlin has no equivalent mechanism, so the Kotlin port exposes the same surface-level
- * helpers in terms of Kotlin's `Throwable` and its `stackTrace`.
+ * helpers in terms of Kotlin's `Throwable` and its stacktrace string.
  */
 public object Nightly {
     /**
@@ -14,22 +14,22 @@ public object Nightly {
      * In Kotlin we model this as a minimal carrier for a single optional backtrace.
      */
     public class Request {
-        internal var backtrace: Array<StackTraceElement>? = null
+        internal var backtrace: Backtrace? = null
 
-        public fun provideRef(backtrace: Array<StackTraceElement>) {
+        public fun provideRef(backtrace: Backtrace) {
             this.backtrace = backtrace
         }
     }
 
-    public fun requestRefBacktrace(err: Throwable): Array<StackTraceElement>? {
-        return err.stackTrace
+    public fun requestRefBacktrace(err: Throwable): Backtrace? {
+        return Backtrace(err.stackTraceToString())
     }
 
-    public fun provideRefBacktrace(request: Request, backtrace: Array<StackTraceElement>) {
+    public fun provideRefBacktrace(request: Request, backtrace: Backtrace) {
         request.provideRef(backtrace)
     }
 
     public fun provide(err: Throwable, request: Request) {
-        provideRefBacktrace(request, err.stackTrace)
+        provideRefBacktrace(request, Backtrace(err.stackTraceToString()))
     }
 }

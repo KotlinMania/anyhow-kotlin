@@ -6,11 +6,11 @@ package io.github.kotlinmania.anyhow
  */
 internal fun ErrorImplDisplay(thisRef: Ref<ErrorImpl>, alternate: Boolean): String {
     val out = StringBuilder()
-    val error = ErrorImplError(thisRef)
+    val error = errorImplError(thisRef)
     out.append(error.toString())
 
     if (alternate) {
-        val chain = ErrorImplChain(thisRef)
+        val chain = errorImplChain(thisRef)
         var first = true
         for (cause in chain) {
             if (first) {
@@ -30,7 +30,7 @@ internal fun ErrorImplDisplay(thisRef: Ref<ErrorImpl>, alternate: Boolean): Stri
  */
 internal fun ErrorImplDebug(thisRef: Ref<ErrorImpl>, alternate: Boolean): String {
     val out = StringBuilder()
-    val error = ErrorImplError(thisRef)
+    val error = errorImplError(thisRef)
 
     if (alternate) {
         out.append(error.toString())
@@ -57,16 +57,14 @@ internal fun ErrorImplDebug(thisRef: Ref<ErrorImpl>, alternate: Boolean): String
         }
     }
 
+    val backtrace = errorImplBacktrace(thisRef)
+    if (backtrace.status() == BacktraceStatus.Captured) {
+        out.append("\n\n")
+        out.append(backtrace.toString())
+    }
+
     return out.toString()
 }
-
-/**
- * Placeholder call sites for the upstream `ErrorImpl::error` and `ErrorImpl::chain` functions,
- * which are translated in `Error.kt`.
- */
-internal fun ErrorImplError(thisRef: Ref<ErrorImpl>): StdError = ErrorImpl.error(thisRef)
-
-internal fun ErrorImplChain(thisRef: Ref<ErrorImpl>): Chain = ErrorImpl.chain(thisRef)
 
 /**
  * Indenting adapter used by anyhow's debug formatting.

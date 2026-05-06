@@ -170,7 +170,11 @@ public interface StdError {
  */
 public class Error internal constructor(
     internal val inner: Own<ErrorImpl>,
-) : Throwable()
+) : Throwable(), StdError {
+    override fun source(): StdError? = errorSource(this)
+
+    public companion object
+}
 
 /**
  * Iterator of a chain of source errors.

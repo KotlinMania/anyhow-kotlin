@@ -1,8 +1,6 @@
 // port-lint: source src/context.rs
 package io.github.kotlinmania.anyhow
 
-import io.github.kotlinmania.anyhow.error.ContextError
-
 /**
  * Kotlin translation of the upstream `context.rs`.
  *
@@ -24,10 +22,6 @@ internal object ext {
     internal interface StdError {
         fun extContext(context: Any): Error
     }
-
-    internal fun StdError.extContext(context: Any): Error = extContext(context)
-
-    internal fun Error.extContext(context: Any): Error = this.context(context)
 }
 
 internal fun Throwable.extContext(context: Any): Error {
@@ -36,7 +30,7 @@ internal fun Throwable.extContext(context: Any): Error {
     }
 
     val backtrace = backtraceIfAbsent(this)
-    return Error.constructFromContext(context, this, backtrace)
+    return Error.constructFromContext(context, throwableAsStdError(this), backtrace)
 }
 
 /**
@@ -107,7 +101,7 @@ public fun <T> T?.withContext(context: () -> Any): Result<T> {
  *
  * while Display formatting prints only the context message.
  */
-internal fun <C, E> contextErrorDebug(contextError: ContextError<C, E>): String {
+internal fun <C, E : StdError> contextErrorDebug(contextError: ContextError<C, E>): String {
     val out = StringBuilder()
     out.append("Error")
     out.append(" { ")
@@ -140,11 +134,11 @@ internal class Quoted<C>(
         fun writeStr(s: String) {
             for (ch in s) {
                 when (ch) {
-                    '\\n' -> out.append("\\n")
-                    '\\r' -> out.append("\\r")
-                    '\\t' -> out.append("\\t")
+                    '\n' -> out.append("\\n")
+                    '\r' -> out.append("\\r")
+                    '\t' -> out.append("\\t")
                     '\"' -> out.append("\\\"")
-                    '\\\\' -> out.append("\\\\")
+                    '\\' -> out.append("\\\\")
                     else -> out.append(ch)
                 }
             }
