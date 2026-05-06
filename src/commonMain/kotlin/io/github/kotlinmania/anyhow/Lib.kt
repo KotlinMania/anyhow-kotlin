@@ -191,7 +191,19 @@ public class Error internal constructor(
  */
 public class Chain internal constructor(
     internal var state: ChainState,
-)
+) : Iterator<StdError> {
+    override fun hasNext(): Boolean = chainHasNext(this)
+
+    override fun next(): StdError = chainNext(this)
+
+    public fun nextBack(): StdError? = chainNextBack(this)
+
+    public fun len(): Int = chainLen(this)
+
+    public companion object {
+        public fun default(): Chain = chainDefault()
+    }
+}
 
 /**
  * `Result<T, Error>` in the upstream.
