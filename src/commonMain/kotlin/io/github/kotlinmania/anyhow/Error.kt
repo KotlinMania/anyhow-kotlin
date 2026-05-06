@@ -140,6 +140,10 @@ public fun Error.backtrace(): Backtrace {
     return errorImplBacktrace(inner.byRef())
 }
 
+public fun Error.debugString(alternate: Boolean = false): String {
+    return ErrorImplDebug(inner.byRef(), alternate = alternate)
+}
+
 public fun Error.intoBoxedDynError(): StdError {
     val outer = this
     return vtable(outer.inner.ptr).objectBoxed(outer.inner)
