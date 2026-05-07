@@ -1,9 +1,6 @@
-// port-lint: source src/fmt.rs
+// port-lint: source fmt.rs
 package io.github.kotlinmania.anyhow
 
-/**
- * Kotlin translation of the upstream `ErrorImpl::display` formatter.
- */
 internal fun ErrorImplDisplay(thisRef: Ref<ErrorImpl>, alternate: Boolean): String {
     val out = StringBuilder()
     val error = errorImplError(thisRef)
@@ -25,9 +22,8 @@ internal fun ErrorImplDisplay(thisRef: Ref<ErrorImpl>, alternate: Boolean): Stri
     return out.toString()
 }
 
-/**
- * Kotlin translation of the upstream `ErrorImpl::debug` formatter.
- */
+internal fun display(thisRef: Ref<ErrorImpl>, alternate: Boolean): String = ErrorImplDisplay(thisRef, alternate)
+
 internal fun ErrorImplDebug(thisRef: Ref<ErrorImpl>, alternate: Boolean): String {
     val out = StringBuilder()
     val error = errorImplError(thisRef)
@@ -66,17 +62,8 @@ internal fun ErrorImplDebug(thisRef: Ref<ErrorImpl>, alternate: Boolean): String
     return out.toString()
 }
 
-/**
- * Indenting adapter used by anyhow's debug formatting.
- *
- * This is a Kotlin translation of the upstream `Indented` writer adapter used to prefix each line
- * with either:
- *
- * - a right-aligned numeric index (`"    2: "`), or
- * - a fixed four-space indent (`"    "`),
- *
- * and to align subsequent lines under the message body.
- */
+internal fun debug(thisRef: Ref<ErrorImpl>, alternate: Boolean): String = ErrorImplDebug(thisRef, alternate)
+
 internal class Indented(
     private val inner: Appendable,
     private val number: Int?,

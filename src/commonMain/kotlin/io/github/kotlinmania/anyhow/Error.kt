@@ -1,16 +1,7 @@
-// port-lint: source src/error.rs
+// port-lint: source error.rs
 package io.github.kotlinmania.anyhow
 
 import kotlin.reflect.KClass
-
-/**
- * Kotlin translation of the upstream `error.rs`.
- *
- * Rust implements `anyhow::Error` as a thin pointer plus a custom vtable that supports downcasting
- * through wrapper layers like `ContextError<C, E>`. Kotlin does not expose trait-object vtables or
- * layout casts; this port preserves the same API surface using Kotlin objects, while keeping the
- * same conceptual pieces (an `ErrorImpl` carrier, an `ErrorVTable`, and `ContextError` wrapping).
- */
 
 internal class ErrorVTable(
     internal val objectRef: (Ref<ErrorImpl>) -> StdError,
@@ -21,18 +12,12 @@ internal class ErrorVTable(
     internal val objectBacktrace: (Ref<ErrorImpl>) -> Backtrace?,
 )
 
-/**
- * Kotlin translation of `ErrorImpl<E>` in the upstream.
- */
 internal class ErrorImpl(
     internal val vtable: ErrorVTable,
     internal val backtrace: Backtrace?,
     internal val `object`: StdError,
 )
 
-/**
- * Kotlin translation of the upstream `ContextError<C, E>`.
- */
 public class ContextError<C, E>(
     public val context: C,
     public val error: E,

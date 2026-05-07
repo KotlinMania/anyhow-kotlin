@@ -1,37 +1,22 @@
-// port-lint: source src/backtrace.rs
+// port-lint: source backtrace.rs
 package io.github.kotlinmania.anyhow
 
-/**
- * Kotlin translation of the upstream `backtrace.rs`.
- *
- * The Rust upstream conditionally uses either:
- *
- * - `std::backtrace::Backtrace`,
- * - the external `backtrace` crate (when the `backtrace` feature is enabled),
- * - or no backtrace support.
- *
- * Kotlin does not have an equivalent feature matrix. This port models backtraces using Kotlin's
- * [StackTraceElement] arrays captured from a [Throwable].
- */
-
-public class Backtrace private constructor(
-    private val captured: Array<StackTraceElement>,
+public class Backtrace internal constructor(
+    private val captured: String,
 ) {
-    public fun status(): BacktraceStatus = BacktraceStatus.Captured
+    public fun status(): BacktraceStatus {
+        return if (captured.isEmpty()) BacktraceStatus.Unsupported else BacktraceStatus.Captured
+    }
 
-    override fun toString(): String = buildString {
-        append("Stack backtrace:\n")
-        for ((i, frame) in captured.withIndex()) {
-            append("   ")
-            append(i)
-            append(": ")
-            append(frame.toString())
-            append('\n')
-        }
-    }.trimEnd()
+    override fun toString(): String {
+        val status = status()
+        if (status == BacktraceStatus.Unsupported) return "unsupported backtrace"
+        if (status == BacktraceStatus.Disabled) return "disabled backtrace"
+        return captured
+    }
 
     public companion object {
-        public fun capture(): Backtrace = Backtrace(Throwable().stackTrace)
+        public fun capture(): Backtrace = Backtrace(Throwable().stackTraceToString())
     }
 }
 
@@ -41,27 +26,15 @@ public enum class BacktraceStatus {
     Captured,
 }
 
-/**
- * Kotlin analog of the upstream `backtrace!()` macro.
- */
 internal fun backtrace(): Backtrace? = Backtrace.capture()
 
-/**
- * Kotlin analog of the upstream `backtrace_if_absent!($err)` macro.
- *
- * In Rust, this avoids capturing an additional backtrace when the underlying error type already
- * provides one through the nightly `Error::provide` mechanism. Kotlin errors always have a stack
- * trace, so this function only captures a new backtrace if the provided throwable has an empty
- * stack trace.
- */
 internal fun backtraceIfAbsent(err: Throwable): Backtrace? {
-    return if (err.stackTrace.isEmpty()) backtrace() else null
+    return if (err.stackTraceToString().isEmpty()) backtrace() else null
 }
 
 internal fun backtraceIfAbsent(err: StdError): Backtrace? {
     return when (err) {
-        is Throwable -> backtraceIfAbsent(err)
+        is Throwable -> backtraceIfAbsent(err as Throwable)
         else -> backtrace()
     }
 }
-

@@ -1,28 +1,22 @@
-// port-lint: source src/lib.rs
+// port-lint: source lib.rs
 package io.github.kotlinmania.anyhow
 
 /**
  * This library provides [Error], a trait-object-like error type for easy idiomatic error handling
  * in Kotlin applications.
  *
- * The upstream project is the Rust crate `anyhow`. Rust relies on `std::error::Error`, the `?`
- * operator, macro calls like `anyhow!(...)` / `bail!(...)`, and conditional compilation. Kotlin has no direct
- * analog for Rust macros or conditional compilation, so this port represents the same API surface
- * using normal Kotlin declarations.
- *
  * # Details
  *
- * - Use `Result<T>` (this port’s [Result]) as the return type of any fallible function.
+ * - Use `Result<T>` (this library’s [Result]) as the return type of any fallible function.
  *
- *   Within the function, use `runCatching { ... }` (or whatever error propagation helper your
- *   Kotlin codebase uses) to propagate failures as exceptions.
+ *   Within the function, propagate failures by throwing.
  *
  *   ```kotlin
  *   interface Deserialize
  *
  *   object SerdeJson {
  *       fun <T : Deserialize> fromString(json: String): T {
- *           error("unimplemented")
+ *           throw RuntimeException("not implemented")
  *       }
  *   }
  *
@@ -42,7 +36,7 @@ package io.github.kotlinmania.anyhow
  *   ```kotlin
  *   class It {
  *       fun detach(): Result<Unit> = runCatching {
- *           error("unimplemented")
+ *           throw RuntimeException("not implemented")
  *       }
  *   }
  *
@@ -81,30 +75,25 @@ package io.github.kotlinmania.anyhow
  *   ```
  *
  * - A backtrace is captured and printed with the error if the underlying error type does not
- *   already provide its own. In Kotlin, stack traces are available through [Throwable.stackTrace]
- *   and are surfaced by this port through its backtrace helpers.
+ *   already provide its own.
  *
- * - Anyhow works with any error type that implements Rust's `std::error::Error`, including ones
- *   defined in your crate. In Kotlin, this port works with error types modeled as [Throwable] or
- *   types participating in the [StdError] surface.
+ * - This library works with error types modeled as [Throwable] or types participating in the
+ *   [StdError] surface.
  *
- * - One-off error messages can be constructed using the upstream macro `anyhow!(...)`, which
- *   supports string interpolation and produces an error. Kotlin has no macro system; this port provides
- *   equivalent helpers as functions in `Macros.kt`.
+ * - One-off error messages can be constructed using helpers like [anyhow] and [bail].
  *
  * # No-std support
  *
- * In the upstream, `no_std` builds are supported. Kotlin Multiplatform has a different runtime
- * model and does not have an equivalent `no_std` mode; this port targets Kotlin/Native, Kotlin/JVM,
- * and Kotlin/JS runtimes instead.
+ * In the upstream, no-std builds are supported. This library targets Kotlin/Native, Kotlin/JVM,
+ * and Kotlin/JS runtimes.
  */
 
 /**
- * A minimal "standard error" abstraction used throughout the anyhow port.
+ * A minimal "standard error" abstraction used throughout the anyhow library.
  *
  * The Rust upstream uses `std::error::Error` (or `core::error::Error`) and provides a `source()`
  * chain for causal errors. Kotlin's closest built-in abstraction is [Throwable]; this interface
- * exists so the port can keep the upstream's naming and call patterns (`source`, `chain`, etc.).
+ * exists so the library can keep the upstream's naming and call patterns (`source`, `chain`, etc.).
  */
 public interface StdError {
     public fun source(): StdError? = null
@@ -120,8 +109,8 @@ public interface StdError {
  *   provide one;
  * - `Error` is represented as a narrow pointer (one word) rather than a fat pointer.
  *
- * Kotlin does not have the same trait-object pointer story; this port retains the structure and
- * API shape while representing errors in terms of Kotlin objects.
+ * Kotlin does not have the same trait-object pointer story; this library retains the structure
+ * and API shape while representing errors in terms of Kotlin objects.
  *
  * ## Display representations
  *
@@ -133,7 +122,7 @@ public interface StdError {
  * ```
  *
  * To print causes as well using anyhow's default formatting of causes, use the alternate
- * representation (modeled by this port’s formatting helpers).
+ * representation (modeled by this library’s formatting helpers).
  *
  * ```text
  * Failed to read instrs from ./path/to/instrs.json: No such file or directory
@@ -179,45 +168,14 @@ public class Error internal constructor(
 }
 
 /**
- * Iterator of a chain of source errors.
- *
- * This type is the iterator returned by `Error.chain()` in the upstream API.
- *
- * # Example
- *
- * ```kotlin
- * fun underlyingIoErrorKind(error: Error): Throwable? {
- *     for (cause in error.chain()) {
- *         val ioError = cause as? Throwable
- *         if (ioError != null) return ioError
- *     }
- *     return null
- * }
- * ```
- */
-public class Chain internal constructor(
-    internal var state: ChainState,
-) : Iterator<StdError> {
-    override fun hasNext(): Boolean = chainHasNext(this)
-
-    override fun next(): StdError = chainNext(this)
-
-    public fun nextBack(): StdError? = chainNextBack(this)
-
-    public fun len(): Int = chainLen(this)
-
-    public companion object {
-        public fun default(): Chain = chainDefault()
-    }
-}
-
-/**
  * `Result<T, Error>` in the upstream.
  *
  * Kotlin's standard library [kotlin.Result] carries failure as a [Throwable]. This port uses that
  * representation and models anyhow's error as a [Throwable]-derived [Error].
  */
 public typealias Result<T> = kotlin.Result<T>
+
+public typealias Bool = Boolean
 
 /**
  * Provides the `context` method for `Result`.
@@ -335,9 +293,7 @@ public interface Context<T, E> {
  * This simplifies creation of an [Result] in places where type inference cannot deduce the error
  * type of a result, without needing explicit type arguments.
  */
-public object Ok {
-    public operator fun <T> invoke(value: T): Result<T> = Result.success(value)
-}
+public fun <T> Ok(value: T): Result<T> = Result.success(value)
 
 // Not public API. Referenced by macro-generated code in the upstream.
 public object __private {

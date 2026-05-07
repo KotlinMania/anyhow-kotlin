@@ -1,17 +1,7 @@
-// port-lint: source src/macros.rs
+// port-lint: source macros.rs
 package io.github.kotlinmania.anyhow
 
-/**
- * Construct an ad-hoc error from a string or existing non-anyhow error value.
- *
- * This is a Kotlin translation of the upstream `anyhow!(...)` macro.
- *
- * Kotlin has no macro system, so this port provides functions that build an [Error] using the same
- * construction rules as the Rust macro:
- *
- * - If called with a string, constructs a message error.
- * - If called with an existing error value, preserves the source chain when possible.
- */
+/** Construct an ad-hoc error from a string or existing non-anyhow error value. */
 public fun anyhow(message: String): Error = Error.msg(message)
 
 public fun anyhow(error: Any): Error {
@@ -22,23 +12,12 @@ public fun anyhow(error: Any): Error {
     }
 }
 
-/**
- * Return early with an error.
- *
- * This is a Kotlin translation of the upstream `bail!(...)` macro.
- *
- * In Kotlin, use this helper to produce a failing [Result] which you can return from the current
- * function.
- */
+/** Return early with an error. */
 public fun bail(message: String): Result<Nothing> = Result.failure(anyhow(message))
 
 public fun bail(error: Any): Result<Nothing> = Result.failure(anyhow(error))
 
-/**
- * Return early with an error if a condition is not satisfied.
- *
- * This is a Kotlin translation of the upstream `ensure!(...)` macro.
- */
+/** Return early with an error if a condition is not satisfied. */
 public fun ensure(cond: Boolean, message: String): Result<Unit> {
     return if (cond) Ok(Unit) else Result.failure(anyhow(message))
 }
@@ -46,4 +25,3 @@ public fun ensure(cond: Boolean, message: String): Result<Unit> {
 public fun ensure(cond: Boolean, error: Any): Result<Unit> {
     return if (cond) Ok(Unit) else Result.failure(anyhow(error))
 }
-

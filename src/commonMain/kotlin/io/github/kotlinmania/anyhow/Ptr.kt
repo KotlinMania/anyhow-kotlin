@@ -1,4 +1,4 @@
-// port-lint: source src/ptr.rs
+// port-lint: source ptr.rs
 package io.github.kotlinmania.anyhow
 
 public data class Own<T>(
@@ -11,6 +11,8 @@ public data class Own<T>(
     public inline fun <reified U> cast(): Own<U> = Own(ptr as U)
 
     public fun boxed(): T = ptr
+
+    public fun clone(): Own<T> = Own(ptr)
 
     public fun byRef(): Ref<T> = Ref.fromRaw(ptr)
 
@@ -33,6 +35,8 @@ public data class Ref<T>(
     public fun asPtr(): T = ptr
 
     public fun deref(): T = ptr
+
+    public fun clone(): Ref<T> = Ref(ptr)
 }
 
 public data class Mut<T>(
@@ -51,6 +55,8 @@ public data class Mut<T>(
     public fun derefMut(): T = ptr
 
     public fun read(): T = ptr
+
+    public fun clone(): Mut<T> = Mut(ptr)
 }
 
 // Force turbofish on all calls of `.cast::<U>()`.

@@ -1,14 +1,31 @@
-// port-lint: source src/chain.rs
+// port-lint: source chain.rs
 package io.github.kotlinmania.anyhow
 
-/**
- * Internal state for the [Chain] iterator.
- *
- * The upstream includes multiple conditional compilation branches for `std` and `no_std` builds.
- * Kotlin has no equivalent conditional compilation in the language; this port keeps a single
- * representation that supports forward iteration and the "double-ended" behavior through a
- * buffered deque.
- */
+public typealias Item = StdError
+
+public class Chain internal constructor(
+    internal var state: ChainState,
+) : Iterator<StdError> {
+    override fun hasNext(): Boolean = chainHasNext(this)
+
+    override fun next(): StdError = chainNext(this)
+
+    public fun nextBack(): StdError? = chainNextBack(this)
+
+    public fun len(): Int = chainLen(this)
+
+    public fun sizeHint(): Pair<Int, Int?> {
+        val len = len()
+        return Pair(len, len)
+    }
+
+    public companion object {
+        public fun new(head: StdError): Chain = chainNew(head)
+
+        public fun default(): Chain = chainDefault()
+    }
+}
+
 internal sealed class ChainState {
     internal data class Linked(
         var next: StdError?,
@@ -19,11 +36,6 @@ internal sealed class ChainState {
     ) : ChainState()
 }
 
-/**
- * Create a new chain iterator starting at [head].
- *
- * Corresponds to `Chain::new(head)` in the upstream.
- */
 public fun chainNew(head: StdError): Chain = Chain(
     state = ChainState.Linked(next = head),
 )
@@ -47,12 +59,6 @@ internal fun chainNext(chain: Chain): StdError {
     }
 }
 
-/**
- * Kotlin analog of the upstream `DoubleEndedIterator::next_back`.
- *
- * When the chain is still in the linked state, we buffer the rest of the causes and switch into
- * a buffered representation, then yield from the back.
- */
 internal fun chainNextBack(chain: Chain): StdError? {
     return when (val s = chain.state) {
         is ChainState.Linked -> {
@@ -70,9 +76,6 @@ internal fun chainNextBack(chain: Chain): StdError? {
     }
 }
 
-/**
- * Kotlin analog of the upstream `ExactSizeIterator::len`.
- */
 internal fun chainLen(chain: Chain): Int = when (val s = chain.state) {
     is ChainState.Linked -> {
         var len = 0
@@ -86,10 +89,6 @@ internal fun chainLen(chain: Chain): Int = when (val s = chain.state) {
     is ChainState.Buffered -> s.rest.size
 }
 
-/**
- * Kotlin analog of the upstream `Default for Chain`.
- */
 internal fun chainDefault(): Chain = Chain(
     state = ChainState.Buffered(rest = ArrayDeque()),
 )
-

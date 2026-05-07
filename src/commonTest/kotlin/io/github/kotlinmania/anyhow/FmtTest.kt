@@ -1,4 +1,4 @@
-// port-lint: source src/fmt.rs
+// port-lint: source fmt.rs
 package io.github.kotlinmania.anyhow
 
 import kotlin.test.Test
@@ -50,4 +50,3 @@ class IndentedTest {
         assertEquals(expected, output.toString())
     }
 }
-
