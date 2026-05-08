@@ -1,8 +1,6 @@
 // port-lint: source chain.rs
 package io.github.kotlinmania.anyhow
 
-public typealias Item = StdError
-
 public class Chain internal constructor(
     internal var state: ChainState,
 ) : Iterator<StdError> {
