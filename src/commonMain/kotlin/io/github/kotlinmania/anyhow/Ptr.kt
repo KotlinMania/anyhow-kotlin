@@ -1,63 +1,62 @@
 // port-lint: source ptr.rs
 package io.github.kotlinmania.anyhow
 
-public data class Own<T>(
-    public val ptr: T,
+internal data class Own<T>(
+    internal val ptr: T,
 ) {
-    public companion object {
-        public fun <T> new(ptr: T): Own<T> = Own(ptr)
+    internal companion object {
+        internal fun <T> new(ptr: T): Own<T> = Own(ptr)
     }
 
-    public inline fun <reified U> cast(): Own<U> = Own(ptr as U)
+    internal inline fun <reified U> cast(): Own<U> = Own(ptr as U)
 
-    public fun boxed(): T = ptr
+    internal fun boxed(): T = ptr
 
-    public fun clone(): Own<T> = Own(ptr)
+    internal fun clone(): Own<T> = Own(ptr)
 
-    public fun byRef(): Ref<T> = Ref.fromRaw(ptr)
+    internal fun byRef(): Ref<T> = Ref.fromRaw(ptr)
 
-    public fun byMut(): Mut<T> = Mut.fromRaw(ptr)
+    internal fun byMut(): Mut<T> = Mut.fromRaw(ptr)
 }
 
-public data class Ref<T>(
-    public val ptr: T,
+internal data class Ref<T>(
+    internal val ptr: T,
 ) {
-    public companion object {
-        public fun <T> new(ptr: T): Ref<T> = Ref(ptr)
+    internal companion object {
+        internal fun <T> new(ptr: T): Ref<T> = Ref(ptr)
 
-        public fun <T> fromRaw(ptr: T): Ref<T> = Ref(ptr)
+        internal fun <T> fromRaw(ptr: T): Ref<T> = Ref(ptr)
     }
 
-    public inline fun <reified U> cast(): Ref<U> = Ref(ptr as U)
+    internal inline fun <reified U> cast(): Ref<U> = Ref(ptr as U)
 
-    public fun byMut(): Mut<T> = Mut.fromRaw(ptr)
+    internal fun byMut(): Mut<T> = Mut.fromRaw(ptr)
 
-    public fun asPtr(): T = ptr
+    internal fun asPtr(): T = ptr
 
-    public fun deref(): T = ptr
+    internal fun deref(): T = ptr
 
-    public fun clone(): Ref<T> = Ref(ptr)
+    internal fun clone(): Ref<T> = Ref(ptr)
 }
 
-public data class Mut<T>(
-    public val ptr: T,
+internal data class Mut<T>(
+    internal val ptr: T,
 ) {
-    public companion object {
-        public fun <T> fromRaw(ptr: T): Mut<T> = Mut(ptr)
+    internal companion object {
+        internal fun <T> fromRaw(ptr: T): Mut<T> = Mut(ptr)
     }
 
-    public inline fun <reified U> cast(): Mut<U> = Mut(ptr as U)
+    internal inline fun <reified U> cast(): Mut<U> = Mut(ptr as U)
 
-    public fun byRef(): Ref<T> = Ref.fromRaw(ptr)
+    internal fun byRef(): Ref<T> = Ref.fromRaw(ptr)
 
-    public fun extend(): Mut<T> = Mut(ptr)
+    internal fun extend(): Mut<T> = Mut(ptr)
 
-    public fun derefMut(): T = ptr
+    internal fun derefMut(): T = ptr
 
-    public fun read(): T = ptr
+    internal fun read(): T = ptr
 
-    public fun clone(): Mut<T> = Mut(ptr)
+    internal fun clone(): Mut<T> = Mut(ptr)
 }
 
-// Force turbofish on all calls of `.cast::<U>()`.
-public interface CastTo
+internal interface CastTo

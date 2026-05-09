@@ -18,9 +18,9 @@ internal class ErrorImpl(
     internal val `object`: StdError,
 )
 
-public class ContextError<C, E>(
-    public val context: C,
-    public val error: E,
+internal class ContextError<C, E>(
+    internal val context: C,
+    internal val error: E,
 ) : StdError where E : StdError {
     override fun source(): StdError? = error
 

@@ -165,8 +165,6 @@ public class Error internal constructor(
  */
 public typealias Result<T> = kotlin.Result<T>
 
-public typealias Bool = Boolean
-
 /**
  * Provides the `context` method for `Result`.
  *
