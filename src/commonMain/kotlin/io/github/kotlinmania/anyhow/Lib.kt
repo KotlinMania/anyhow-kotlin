@@ -162,7 +162,7 @@ public class Error internal constructor(
 ) : Throwable(), StdError {
     override fun source(): StdError? = errorSource(this)
 
-    override fun toString(): String = ErrorImplDisplay(inner.byRef(), alternate = false)
+    override fun toString(): String = display(inner.byRef(), alternate = false)
 
     public companion object
 }

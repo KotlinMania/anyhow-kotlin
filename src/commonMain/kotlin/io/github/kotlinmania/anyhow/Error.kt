@@ -126,7 +126,7 @@ public fun Error.backtrace(): Backtrace {
 }
 
 public fun Error.debugString(alternate: Boolean = false): String {
-    return ErrorImplDebug(inner.byRef(), alternate = alternate)
+    return debug(inner.byRef(), alternate = alternate)
 }
 
 public fun Error.intoBoxedDynError(): StdError {
