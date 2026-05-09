@@ -2,7 +2,7 @@
 package io.github.kotlinmania.anyhow
 
 /**
- * This library provides [Error], a trait-object-like error type for easy idiomatic error handling
+ * This library provides [Error], a dynamic error type for easy idiomatic error handling
  * in Kotlin applications.
  *
  * # Details
@@ -57,9 +57,8 @@ package io.github.kotlinmania.anyhow
  *       No such file or directory
  *   ```
  *
- * - Downcasting is supported and can be by value, by shared reference, or by mutable reference as
- *   needed. In Kotlin, this corresponds to `is` checks and safe casts (`as?`) over the dynamic
- *   underlying error type.
+ * - Downcasting is supported and can be done by value, by shared reference, or by mutable reference
+ *   as needed.
  *
  *   ```kotlin
  *   sealed class DataStoreError : Throwable() {
@@ -82,35 +81,29 @@ package io.github.kotlinmania.anyhow
  *
  * - One-off error messages can be constructed using helpers like [anyhow] and [bail].
  *
- * # No-std support
+ * # Targets
  *
- * In the upstream, no-std builds are supported. This library targets Kotlin/Native, Kotlin/JVM,
- * and Kotlin/JS runtimes.
+ * Kotlin/Native, Kotlin/JVM, and Kotlin/JS runtimes.
  */
 
 /**
  * A minimal "standard error" abstraction used throughout the anyhow library.
- *
- * The Rust upstream uses `std::error::Error` (or `core::error::Error`) and provides a `source()`
- * chain for causal errors. Kotlin's closest built-in abstraction is [Throwable]; this interface
- * exists so the library can keep the upstream's naming and call patterns (`source`, `chain`, etc.).
+ * Provides a [source] chain for causal errors.
  */
 public interface StdError {
     public fun source(): StdError? = null
 }
 
 /**
- * The `Error` type, a wrapper around a dynamic error type.
+ * The [Error] type, a wrapper around a dynamic error type.
  *
- * Upstream, `Error` behaves similarly to a boxed `Throwable` with these differences:
+ * [Error] works a lot like a boxed [StdError], but with these differences:
  *
- * - `Error` requires that the error is thread-safe and long-lived in Rust terms;
- * - `Error` guarantees that a backtrace is available, even if the underlying error type does not
- *   provide one;
- * - `Error` is represented as a narrow pointer (one word) rather than a fat pointer.
- *
- * Kotlin does not have the same trait-object pointer story; this library retains the structure
- * and API shape while representing errors in terms of Kotlin objects.
+ * - [Error] requires that the error is thread-safe.
+ * - [Error] guarantees that a backtrace is available, even if the underlying
+ *   error type does not provide one.
+ * - [Error] is represented as a narrow pointer — exactly one word in size
+ *   instead of two.
  *
  * ## Display representations
  *
@@ -168,10 +161,7 @@ public class Error internal constructor(
 }
 
 /**
- * `Result<T, Error>` in the upstream.
- *
- * Kotlin's standard library [kotlin.Result] carries failure as a [Throwable]. This port uses that
- * representation and models anyhow's error as a [Throwable]-derived [Error].
+ * Type alias for [kotlin.Result] with failure pinned to [Error].
  */
 public typealias Result<T> = kotlin.Result<T>
 
@@ -288,14 +278,12 @@ public interface Context<T, E> {
 }
 
 /**
- * Equivalent to `Ok::<_, anyhow::Error>(value)` in the upstream.
- *
- * This simplifies creation of an [Result] in places where type inference cannot deduce the error
- * type of a result, without needing explicit type arguments.
+ * Equivalent to `Result.success(value)` for an anyhow [Result], with the failure
+ * type pinned to [Error] without explicit type arguments.
  */
 public fun <T> Ok(value: T): Result<T> = Result.success(value)
 
-// Not public API. Referenced by macro-generated code in the upstream.
+// Not public API. Used by the [anyhow], [bail], and [ensure] helpers.
 public object __private {
     public fun formatErr(message: String): Error = anyhow(message)
 
