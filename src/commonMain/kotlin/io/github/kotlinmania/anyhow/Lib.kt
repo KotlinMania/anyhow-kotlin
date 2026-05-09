@@ -7,25 +7,14 @@ package io.github.kotlinmania.anyhow
  *
  * # Details
  *
- * - Use `Result<T>` (this library’s [Result]) as the return type of any fallible function.
+ * - Use [Result] as the return type of any fallible function.
  *
  *   Within the function, propagate failures by throwing.
  *
  *   ```kotlin
- *   interface Deserialize
- *
- *   object SerdeJson {
- *       fun <T : Deserialize> fromString(json: String): T {
- *           throw RuntimeException("not implemented")
- *       }
- *   }
- *
- *   class ClusterMap : Deserialize
- *
  *   fun getClusterInfo(): Result<ClusterMap> = runCatching {
- *       val config = readText("cluster.json")
- *       val map: ClusterMap = SerdeJson.fromString(config)
- *       map
+ *       val config = readToString("cluster.json")
+ *       SerdeJson.fromStr<ClusterMap>(config)
  *   }
  *   ```
  *
@@ -34,20 +23,12 @@ package io.github.kotlinmania.anyhow
  *   more context about what higher level step the application was in the middle of.
  *
  *   ```kotlin
- *   class It {
- *       fun detach(): Result<Unit> = runCatching {
- *           throw RuntimeException("not implemented")
- *       }
- *   }
- *
  *   fun main(): Result<Unit> = runCatching {
- *       val it = It()
- *       val path = "./path/to/instrs.json"
- *
- *       it.detach().getOrThrow()
+ *       it.detach().context("Failed to detach the important thing").getOrThrow()
  *       val content = readBytes(path)
- *       content
- *   }.map { Unit }
+ *           .withContext { "Failed to read instrs from $path" }
+ *           .getOrThrow()
+ *   }
  *   ```
  *
  *   ```text
@@ -177,13 +158,11 @@ public typealias Result<T> = kotlin.Result<T>
  * # Example
  *
  * ```kotlin
- * class ImportantThing(val path: String) {
- *     fun detach(): Result<Unit> = runCatching { Unit }
- * }
- *
  * fun doIt(it: ImportantThing): Result<ByteArray> = runCatching {
- *     it.detach().getOrThrow()
+ *     it.detach().context("Failed to detach the important thing").getOrThrow()
  *     readBytes(it.path)
+ *         .withContext { "Failed to read instrs from ${it.path}" }
+ *         .getOrThrow()
  * }
  * ```
  *
@@ -216,25 +195,15 @@ public typealias Result<T> = kotlin.Result<T>
  *   you should freely add human-readable context to errors wherever it would be helpful.
  *
  *   ```kotlin
- *   class SuspiciousError : Throwable()
- *
- *   fun helper(): Result<Unit> = Result.failure(SuspiciousError())
- *
  *   fun doIt(): Result<Unit> = runCatching {
- *       helper().getOrThrow()
+ *       helper().context("...").getOrThrow()
  *   }
  *
- *   fun main() {
- *       val err = doIt().exceptionOrNull()
- *       if (err is Error) {
- *           val suspicious = err.downcastRef<SuspiciousError>()
- *           if (suspicious != null) {
- *               // If helper() returned SuspiciousError, this downcast will correctly succeed even
- *               // with the context in between.
- *               return
- *           }
- *       }
- *       error("expected downcast to succeed")
+ *   val err = doIt().exceptionOrNull()
+ *   if (err is Error) {
+ *       val suspicious = err.downcastRef<SuspiciousError>()
+ *       // If helper() returned SuspiciousError, this downcast will correctly succeed
+ *       // even with the context in between.
  *   }
  *   ```
  *
@@ -244,25 +213,15 @@ public typealias Result<T> = kotlin.Result<T>
  *   that will be actionable to higher levels of the application.
  *
  *   ```kotlin
- *   class HelperFailed : Throwable()
- *
- *   fun helper(): Result<Unit> = Result.failure(RuntimeException("no such file or directory"))
- *
  *   fun doIt(): Result<Unit> = runCatching {
- *       helper().getOrThrow()
+ *       helper().context(HelperFailed).getOrThrow()
  *   }
  *
- *   fun main() {
- *       val err = doIt().exceptionOrNull()
- *       if (err is Error) {
- *           val helperFailed = err.downcastRef<HelperFailed>()
- *           if (helperFailed != null) {
- *               // If helper failed, this downcast will succeed because HelperFailed is the context
- *               // that has been attached to that error.
- *               return
- *           }
- *       }
- *       error("expected downcast to succeed")
+ *   val err = doIt().exceptionOrNull()
+ *   if (err is Error) {
+ *       val helperFailed = err.downcastRef<HelperFailed>()
+ *       // If helper failed, this downcast will succeed because HelperFailed is the
+ *       // context that has been attached to that error.
  *   }
  *   ```
  */
