@@ -86,6 +86,10 @@ package io.github.kotlinmania.anyhow
  * Kotlin/Native, Kotlin/JVM, and Kotlin/JS runtimes.
  */
 
+// Re-exports tracked but not bridged via typealias — see workspace CLAUDE.md.
+// pub use anyhow as format_err;
+// Callers migrated:
+
 /**
  * A minimal "standard error" abstraction used throughout the anyhow library.
  * Provides a [source] chain for causal errors.
