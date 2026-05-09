@@ -84,19 +84,30 @@ internal class Quoted<C>(
         private val out: Appendable,
     ) {
         fun writeStr(s: String) {
-            for (ch in s) {
-                when (ch) {
-                    '\n' -> out.append("\\n")
-                    '\r' -> out.append("\\r")
-                    '\t' -> out.append("\\t")
-                    '\"' -> out.append("\\\"")
-                    '\\' -> out.append("\\\\")
-                    else -> out.append(ch)
-                }
-            }
+            out.append(s.escapeDebug())
         }
     }
 }
+
+private fun String.escapeDebug(): String {
+    val out = StringBuilder()
+    for (ch in this) {
+        out.append(ch.escapeDebug())
+    }
+    return out.toString()
+}
+
+private fun Char.escapeDebug(): String =
+    when (this) {
+        '\t' -> "\\t"
+        '\r' -> "\\r"
+        '\n' -> "\\n"
+        '\\' -> "\\\\"
+        '\'' -> "\\'"
+        '"' -> "\\\""
+        in ' '..'~' -> this.toString()
+        else -> "\\u{" + code.toString(16) + "}"
+    }
 
 internal object `private` {
     internal interface Sealed
