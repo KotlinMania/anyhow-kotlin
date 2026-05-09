@@ -36,14 +36,20 @@ public fun <T> Result<T>.withContext(context: () -> Any): Result<T> {
     return Result.failure(error.extContext(context()))
 }
 
-public fun <T> T?.context(context: Any): Result<T> {
+// Upstream Rust defines `impl<T> Context<T, Infallible> for Option<T>` alongside the
+// Result impl above. In Kotlin, the receiver and `Any`/`() -> Any` parameter both
+// erase on JVM, so a literal port `T?.context(Any)` clashes with the Result version
+// (both erase to `(Object, Object)`). Renaming the Option-receiver pair to
+// `toResult` / `toResultWith` keeps the same semantic ("None -> Err, Some -> Ok")
+// while giving the JVM compiler a distinct method name.
+public fun <T> T?.toResult(context: Any): Result<T> {
     return when (this) {
         null -> Result.failure(Error.constructFromDisplay(context, backtrace()))
         else -> Ok(this)
     }
 }
 
-public fun <T> T?.withContext(context: () -> Any): Result<T> {
+public fun <T> T?.toResultWith(context: () -> Any): Result<T> {
     return when (this) {
         null -> Result.failure(Error.constructFromDisplay(context(), backtrace()))
         else -> Ok(this)
