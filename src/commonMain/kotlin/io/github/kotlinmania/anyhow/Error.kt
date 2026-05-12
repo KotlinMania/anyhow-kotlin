@@ -18,9 +18,9 @@ internal class ErrorImpl(
     internal val `object`: StdError,
 )
 
-public class ContextError<C, E>(
-    public val context: C,
-    public val error: E,
+internal class ContextError<C, E>(
+    internal val context: C,
+    internal val error: E,
 ) : StdError where E : StdError {
     override fun source(): StdError? = error
 
@@ -126,7 +126,7 @@ public fun Error.backtrace(): Backtrace {
 }
 
 public fun Error.debugString(alternate: Boolean = false): String {
-    return ErrorImplDebug(inner.byRef(), alternate = alternate)
+    return debug(inner.byRef(), alternate = alternate)
 }
 
 public fun Error.intoBoxedDynError(): StdError {

@@ -5,12 +5,12 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 12/12 (100.0%)
-- **Function parity:** 73/106 matched (target 147) — 68.9%
-- **Class/type parity:** 33/43 matched (target 46) — 76.7%
-- **Combined symbol parity:** 106/149 matched (target 193) — 71.1%
-- **Average inline-code cosine:** 0.32 (function body across 12 matched files)
+- **Function parity:** 73/106 matched (target 146) — 68.9%
+- **Class/type parity:** 31/43 matched (target 44) — 72.1%
+- **Combined symbol parity:** 104/149 matched (target 190) — 69.8%
+- **Average inline-code cosine:** 0.35 (function body across 12 matched files)
 - **Average documentation cosine:** 0.11 (doc text across 12 matched files)
-- **Cheat-zeroed Files:** 2
+- **Cheat-zeroed Files:** 1
 - **Critical Issues:** 10 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
@@ -62,22 +62,22 @@ Every matched file is listed below with function and type symbol parity.
 
 ### 4. chain
 
-- **Target:** `anyhow.Chain [ZERO]`
-- **Similarity:** 0.00
+- **Target:** `anyhow.Chain`
+- **Similarity:** 0.42
 - **Dependents:** 2
-- **Priority Score:** 2000910.0
-- **Functions:** 6/6 matched (target 14)
+- **Priority Score:** 2010905.9
+- **Functions:** 6/6 matched (target 13)
 - **Missing functions:** _none_
-- **Types:** 3/3 matched (target 5)
-- **Missing types:** _none_
+- **Types:** 2/3 matched (target 4)
+- **Missing types:** `Item`
 
 ### 5. fmt
 
 - **Target:** `anyhow.Fmt`
-- **Similarity:** 0.66
+- **Similarity:** 0.73
 - **Dependents:** 1
-- **Priority Score:** 1000703.4
-- **Functions:** 6/6 matched (target 8)
+- **Priority Score:** 1000702.7
+- **Functions:** 6/6 matched
 - **Missing functions:** _none_
 - **Types:** 1/1 matched (target 2)
 - **Missing types:** _none_
@@ -86,10 +86,10 @@ Every matched file is listed below with function and type symbol parity.
 ### 6. context
 
 - **Target:** `anyhow.Context`
-- **Similarity:** 0.31
+- **Similarity:** 0.22
 - **Dependents:** 0
-- **Priority Score:** 31006.9
-- **Functions:** 4/7 matched (target 8)
+- **Priority Score:** 31007.8
+- **Functions:** 4/7 matched (target 10)
 - **Missing functions:** `fmt`, `source`, `provide`
 - **Types:** 3/3 matched (target 8)
 - **Missing types:** _none_
@@ -116,7 +116,19 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/1 matched (target 2)
 - **Missing types:** `MyError`
 
-### 9. wrapper
+### 9. lib
+
+- **Target:** `anyhow.Lib`
+- **Similarity:** 0.49
+- **Dependents:** 0
+- **Priority Score:** 21105.1
+- **Functions:** 5/5 matched (target 7)
+- **Missing functions:** _none_
+- **Types:** 4/6 matched (target 5)
+- **Missing types:** `Chain`, `Bool`
+- **Lint issues:** 1
+
+### 10. wrapper
 
 - **Target:** `anyhow.Wrapper`
 - **Similarity:** 0.09
@@ -126,18 +138,6 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** `fmt`, `provide`
 - **Types:** 3/3 matched
 - **Missing types:** _none_
-
-### 10. lib
-
-- **Target:** `anyhow.Lib`
-- **Similarity:** 0.49
-- **Dependents:** 0
-- **Priority Score:** 11105.1
-- **Functions:** 5/5 matched (target 7)
-- **Missing functions:** _none_
-- **Types:** 5/6 matched
-- **Missing types:** `Chain`
-- **Lint issues:** 1
 
 ### 11. kind
 

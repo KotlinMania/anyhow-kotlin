@@ -2,13 +2,14 @@
 package io.github.kotlinmania.anyhow
 
 /**
- * Tagged dispatch mechanism for resolving the behavior of `anyhow!(expr)` in the upstream.
+ * Tagged dispatch mechanism for resolving the behavior of [anyhow] given a single expression.
  *
- * In Rust, the `anyhow!` macro uses method-resolution tricks to choose between:
+ * Three [Error] construction paths are available, chosen by which marker interface
+ * the input value satisfies:
  *
- * - constructing an adhoc message error for values that are only displayable/debuggable, or
- * - using an existing standard error implementation (preserving `source()` and backtrace),
- * - or constructing from a boxed dynamic error.
+ * - [AdhocKind] — construct an adhoc message error for values that are only displayable.
+ * - [TraitKind] — use an existing [StdError] implementation, preserving its [source] and backtrace.
+ * - [BoxedKind] — construct from a boxed dynamic [StdError].
  */
 
 public object Adhoc
@@ -41,7 +42,7 @@ public fun Boxed.new(error: StdError): Error {
 }
 
 /**
- * Helper interface for values that can be converted into [Error], corresponding to Rust's `Into<Error>`.
+ * Helper interface for values that can be converted into [Error].
  */
 public interface ErrorConvertible {
     public fun intoError(): Error

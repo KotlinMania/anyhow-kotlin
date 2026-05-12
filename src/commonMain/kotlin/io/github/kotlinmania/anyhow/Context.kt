@@ -36,12 +36,6 @@ public fun <T> Result<T>.withContext(context: () -> Any): Result<T> {
     return Result.failure(error.extContext(context()))
 }
 
-// Upstream Rust defines `impl<T> Context<T, Infallible> for Option<T>` alongside the
-// Result impl above. In Kotlin, the receiver and `Any`/`() -> Any` parameter both
-// erase on JVM, so a literal port `T?.context(Any)` clashes with the Result version
-// (both erase to `(Object, Object)`). Renaming the Option-receiver pair to
-// `toResult` / `toResultWith` keeps the same semantic ("None -> Err, Some -> Ok")
-// while giving the JVM compiler a distinct method name.
 public fun <T> T?.toResult(context: Any): Result<T> {
     return when (this) {
         null -> Result.failure(Error.constructFromDisplay(context, backtrace()))
@@ -84,19 +78,30 @@ internal class Quoted<C>(
         private val out: Appendable,
     ) {
         fun writeStr(s: String) {
-            for (ch in s) {
-                when (ch) {
-                    '\n' -> out.append("\\n")
-                    '\r' -> out.append("\\r")
-                    '\t' -> out.append("\\t")
-                    '\"' -> out.append("\\\"")
-                    '\\' -> out.append("\\\\")
-                    else -> out.append(ch)
-                }
-            }
+            out.append(s.escapeDebug())
         }
     }
 }
+
+private fun String.escapeDebug(): String {
+    val out = StringBuilder()
+    for (ch in this) {
+        out.append(ch.escapeDebug())
+    }
+    return out.toString()
+}
+
+private fun Char.escapeDebug(): String =
+    when (this) {
+        '\t' -> "\\t"
+        '\r' -> "\\r"
+        '\n' -> "\\n"
+        '\\' -> "\\\\"
+        '\'' -> "\\'"
+        '"' -> "\\\""
+        in ' '..'~' -> this.toString()
+        else -> "\\u{" + code.toString(16) + "}"
+    }
 
 internal object `private` {
     internal interface Sealed

@@ -2,30 +2,19 @@
 package io.github.kotlinmania.anyhow
 
 /**
- * This library provides [Error], a trait-object-like error type for easy idiomatic error handling
+ * This library provides [Error], a dynamic error type for easy idiomatic error handling
  * in Kotlin applications.
  *
  * # Details
  *
- * - Use `Result<T>` (this library’s [Result]) as the return type of any fallible function.
+ * - Use [Result] as the return type of any fallible function.
  *
  *   Within the function, propagate failures by throwing.
  *
  *   ```kotlin
- *   interface Deserialize
- *
- *   object SerdeJson {
- *       fun <T : Deserialize> fromString(json: String): T {
- *           throw RuntimeException("not implemented")
- *       }
- *   }
- *
- *   class ClusterMap : Deserialize
- *
  *   fun getClusterInfo(): Result<ClusterMap> = runCatching {
- *       val config = readText("cluster.json")
- *       val map: ClusterMap = SerdeJson.fromString(config)
- *       map
+ *       val config = readToString("cluster.json")
+ *       SerdeJson.fromStr<ClusterMap>(config)
  *   }
  *   ```
  *
@@ -34,20 +23,12 @@ package io.github.kotlinmania.anyhow
  *   more context about what higher level step the application was in the middle of.
  *
  *   ```kotlin
- *   class It {
- *       fun detach(): Result<Unit> = runCatching {
- *           throw RuntimeException("not implemented")
- *       }
- *   }
- *
  *   fun main(): Result<Unit> = runCatching {
- *       val it = It()
- *       val path = "./path/to/instrs.json"
- *
- *       it.detach().getOrThrow()
+ *       it.detach().context("Failed to detach the important thing").getOrThrow()
  *       val content = readBytes(path)
- *       content
- *   }.map { Unit }
+ *           .withContext { "Failed to read instrs from $path" }
+ *           .getOrThrow()
+ *   }
  *   ```
  *
  *   ```text
@@ -57,9 +38,8 @@ package io.github.kotlinmania.anyhow
  *       No such file or directory
  *   ```
  *
- * - Downcasting is supported and can be by value, by shared reference, or by mutable reference as
- *   needed. In Kotlin, this corresponds to `is` checks and safe casts (`as?`) over the dynamic
- *   underlying error type.
+ * - Downcasting is supported and can be done by value, by shared reference, or by mutable reference
+ *   as needed.
  *
  *   ```kotlin
  *   sealed class DataStoreError : Throwable() {
@@ -82,35 +62,33 @@ package io.github.kotlinmania.anyhow
  *
  * - One-off error messages can be constructed using helpers like [anyhow] and [bail].
  *
- * # No-std support
+ * # Targets
  *
- * In the upstream, no-std builds are supported. This library targets Kotlin/Native, Kotlin/JVM,
- * and Kotlin/JS runtimes.
+ * Kotlin/Native, Kotlin/JVM, and Kotlin/JS runtimes.
  */
+
+// Re-exports tracked but not bridged via typealias — see workspace CLAUDE.md.
+// pub use anyhow as format_err;
+// Callers migrated:
 
 /**
  * A minimal "standard error" abstraction used throughout the anyhow library.
- *
- * The Rust upstream uses `std::error::Error` (or `core::error::Error`) and provides a `source()`
- * chain for causal errors. Kotlin's closest built-in abstraction is [Throwable]; this interface
- * exists so the library can keep the upstream's naming and call patterns (`source`, `chain`, etc.).
+ * Provides a [source] chain for causal errors.
  */
 public interface StdError {
     public fun source(): StdError? = null
 }
 
 /**
- * The `Error` type, a wrapper around a dynamic error type.
+ * The [Error] type, a wrapper around a dynamic error type.
  *
- * Upstream, `Error` behaves similarly to a boxed `Throwable` with these differences:
+ * [Error] works a lot like a boxed [StdError], but with these differences:
  *
- * - `Error` requires that the error is thread-safe and long-lived in Rust terms;
- * - `Error` guarantees that a backtrace is available, even if the underlying error type does not
- *   provide one;
- * - `Error` is represented as a narrow pointer (one word) rather than a fat pointer.
- *
- * Kotlin does not have the same trait-object pointer story; this library retains the structure
- * and API shape while representing errors in terms of Kotlin objects.
+ * - [Error] requires that the error is thread-safe.
+ * - [Error] guarantees that a backtrace is available, even if the underlying
+ *   error type does not provide one.
+ * - [Error] is represented as a narrow pointer — exactly one word in size
+ *   instead of two.
  *
  * ## Display representations
  *
@@ -162,20 +140,15 @@ public class Error internal constructor(
 ) : Throwable(), StdError {
     override fun source(): StdError? = errorSource(this)
 
-    override fun toString(): String = ErrorImplDisplay(inner.byRef(), alternate = false)
+    override fun toString(): String = display(inner.byRef(), alternate = false)
 
     public companion object
 }
 
 /**
- * `Result<T, Error>` in the upstream.
- *
- * Kotlin's standard library [kotlin.Result] carries failure as a [Throwable]. This port uses that
- * representation and models anyhow's error as a [Throwable]-derived [Error].
+ * Type alias for [kotlin.Result] with failure pinned to [Error].
  */
 public typealias Result<T> = kotlin.Result<T>
-
-public typealias Bool = Boolean
 
 /**
  * Provides the `context` method for `Result`.
@@ -185,13 +158,11 @@ public typealias Bool = Boolean
  * # Example
  *
  * ```kotlin
- * class ImportantThing(val path: String) {
- *     fun detach(): Result<Unit> = runCatching { Unit }
- * }
- *
  * fun doIt(it: ImportantThing): Result<ByteArray> = runCatching {
- *     it.detach().getOrThrow()
+ *     it.detach().context("Failed to detach the important thing").getOrThrow()
  *     readBytes(it.path)
+ *         .withContext { "Failed to read instrs from ${it.path}" }
+ *         .getOrThrow()
  * }
  * ```
  *
@@ -224,25 +195,15 @@ public typealias Bool = Boolean
  *   you should freely add human-readable context to errors wherever it would be helpful.
  *
  *   ```kotlin
- *   class SuspiciousError : Throwable()
- *
- *   fun helper(): Result<Unit> = Result.failure(SuspiciousError())
- *
  *   fun doIt(): Result<Unit> = runCatching {
- *       helper().getOrThrow()
+ *       helper().context("...").getOrThrow()
  *   }
  *
- *   fun main() {
- *       val err = doIt().exceptionOrNull()
- *       if (err is Error) {
- *           val suspicious = err.downcastRef<SuspiciousError>()
- *           if (suspicious != null) {
- *               // If helper() returned SuspiciousError, this downcast will correctly succeed even
- *               // with the context in between.
- *               return
- *           }
- *       }
- *       error("expected downcast to succeed")
+ *   val err = doIt().exceptionOrNull()
+ *   if (err is Error) {
+ *       val suspicious = err.downcastRef<SuspiciousError>()
+ *       // If helper() returned SuspiciousError, this downcast will correctly succeed
+ *       // even with the context in between.
  *   }
  *   ```
  *
@@ -252,25 +213,15 @@ public typealias Bool = Boolean
  *   that will be actionable to higher levels of the application.
  *
  *   ```kotlin
- *   class HelperFailed : Throwable()
- *
- *   fun helper(): Result<Unit> = Result.failure(RuntimeException("no such file or directory"))
- *
  *   fun doIt(): Result<Unit> = runCatching {
- *       helper().getOrThrow()
+ *       helper().context(HelperFailed).getOrThrow()
  *   }
  *
- *   fun main() {
- *       val err = doIt().exceptionOrNull()
- *       if (err is Error) {
- *           val helperFailed = err.downcastRef<HelperFailed>()
- *           if (helperFailed != null) {
- *               // If helper failed, this downcast will succeed because HelperFailed is the context
- *               // that has been attached to that error.
- *               return
- *           }
- *       }
- *       error("expected downcast to succeed")
+ *   val err = doIt().exceptionOrNull()
+ *   if (err is Error) {
+ *       val helperFailed = err.downcastRef<HelperFailed>()
+ *       // If helper failed, this downcast will succeed because HelperFailed is the
+ *       // context that has been attached to that error.
  *   }
  *   ```
  */
@@ -288,14 +239,12 @@ public interface Context<T, E> {
 }
 
 /**
- * Equivalent to `Ok::<_, anyhow::Error>(value)` in the upstream.
- *
- * This simplifies creation of an [Result] in places where type inference cannot deduce the error
- * type of a result, without needing explicit type arguments.
+ * Equivalent to `Result.success(value)` for an anyhow [Result], with the failure
+ * type pinned to [Error] without explicit type arguments.
  */
 public fun <T> Ok(value: T): Result<T> = Result.success(value)
 
-// Not public API. Referenced by macro-generated code in the upstream.
+// Not public API. Used by the [anyhow], [bail], and [ensure] helpers.
 public object __private {
     public fun formatErr(message: String): Error = anyhow(message)
 
