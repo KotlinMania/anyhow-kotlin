@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.ClasspathNormalizer
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
@@ -20,7 +21,6 @@ plugins {
 
 group = "io.github.kotlinmania"
 version = "0.1.0"
-
 val androidSdkDir: String? =
     providers.environmentVariable("ANDROID_SDK_ROOT").orNull
         ?: providers.environmentVariable("ANDROID_HOME").orNull
