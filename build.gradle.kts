@@ -27,12 +27,21 @@ version = "0.1.1"
 // The Android Gradle plugin resolves the SDK location while Gradle builds the
 // task graph — before any task executes — so a project-local Android SDK must
 // already be installed by the time configuration runs. setup-android-sdk.sh
-// installs the SDK into this repo's own .android-sdk/ and writes
-// local.properties to point there. It runs unconditionally on every
-// configuration: the script itself is idempotent (an already-installed SDK is
-// a fast no-op), but there is deliberately no Gradle-side condition that could
-// skip the install, and no fallback to a sibling repo's SDK.
-serviceOf<ExecOperations>().exec { commandLine("bash", "./setup-android-sdk.sh") }
+// and setup-android-sdk.bat install the SDK into this repo's own .android-sdk/
+// and write local.properties to point there. The installer runs
+// unconditionally on every configuration: each script is idempotent (an
+// already-installed SDK is a fast no-op), but there is deliberately no
+// Gradle-side condition that could skip the install, and no fallback to a
+// sibling repo's SDK.
+val isWindowsHost = System.getProperty("os.name").lowercase().contains("windows")
+val androidSdkSetupCommand =
+    if (isWindowsHost) {
+        listOf("cmd", "/c", "setup-android-sdk.bat")
+    } else {
+        listOf("bash", "./setup-android-sdk.sh")
+    }
+
+serviceOf<ExecOperations>().exec { commandLine(androidSdkSetupCommand) }
 
 kotlin {
     applyDefaultHierarchyTemplate()
@@ -369,7 +378,7 @@ val codeqlCompileJvm = tasks.register<JavaExec>("codeqlCompileJvm") {
 tasks.register<Exec>("setupAndroidSdk") {
     group = "setup"
     description = "Downloads and configures the project-local Android SDK."
-    commandLine("./setup-android-sdk.sh")
+    commandLine(androidSdkSetupCommand)
 }
 
 tasks.register("test") {
