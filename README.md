@@ -206,7 +206,7 @@ be dual licensed as above, without any additional terms or conditions.
 
 ```kotlin
 dependencies {
-    implementation("io.github.kotlinmania:anyhow-kotlin:0.1.0")
+    implementation("io.github.kotlinmania:anyhow-kotlin:0.1.1")
 }
 ```
 
@@ -220,12 +220,17 @@ dependencies {
 ### Targets
 
 - macOS arm64
-- Linux x64
+- Linux x64 / arm64
 - Windows mingw-x64
 - iOS arm64 / simulator-arm64 (Swift export + XCFramework)
+- tvOS arm64 / simulator-arm64
+- watchOS arm32 / arm64 / device-arm64 / simulator-arm64
+- Android Native arm32 / arm64 / x86 / x64
 - JS (browser + Node.js)
 - Wasm-JS (browser + Node.js)
+- Wasm-WASI (Node.js)
 - Android (API 24+)
+- JVM
 
 ### Porting guidelines
 
