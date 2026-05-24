@@ -1,5 +1,5 @@
 {
-  "type": "port",
+  "parity_mode": false,
   "name": "anyhow-kotlin",
   "source": {
     "path": "tmp/anyhow/src",
