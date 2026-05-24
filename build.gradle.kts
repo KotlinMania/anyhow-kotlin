@@ -50,6 +50,11 @@ val androidSdkManager = projectAndroidSdkDir.resolve(
     },
 )
 val androidSdkInstallMarker = projectAndroidSdkDir.resolve(".install-complete")
+val requiredAndroidSdkPackageDirs = listOf(
+    projectAndroidSdkDir.resolve("platform-tools"),
+    projectAndroidSdkDir.resolve("platforms/android-$projectCompileSdk"),
+    projectAndroidSdkDir.resolve("build-tools/$projectAndroidBuildTools"),
+)
 
 fun writeAndroidLocalProperties() {
     val sdkDirPropertyValue = projectAndroidSdkDir.absolutePath.replace("\\", "/")
@@ -62,6 +67,11 @@ fun sdkManagerCommand(vararg args: String): List<String> =
     } else {
         listOf(androidSdkManager.absolutePath) + args
     }
+
+fun isProjectAndroidSdkInstalled(): Boolean =
+    androidSdkInstallMarker.exists() &&
+        androidSdkManager.exists() &&
+        requiredAndroidSdkPackageDirs.all { it.exists() }
 
 fun downloadAndroidCommandLineTools() {
     val zipName = "commandlinetools-$androidSdkOsName-${androidCommandLineToolsRevision}_latest.zip"
@@ -114,10 +124,14 @@ fun downloadAndroidCommandLineTools() {
 }
 
 fun installProjectAndroidSdk(execOperations: ExecOperations) {
-    if (androidSdkInstallMarker.exists() && androidSdkManager.exists()) {
+    if (isProjectAndroidSdkInstalled()) {
         writeAndroidLocalProperties()
         println("setup-android-sdk: SDK already installed at $projectAndroidSdkDir")
         return
+    }
+
+    if (androidSdkInstallMarker.exists()) {
+        println("setup-android-sdk: cached SDK is missing required packages; repairing $projectAndroidSdkDir")
     }
 
     if (!androidSdkManager.exists()) {
@@ -163,6 +177,12 @@ fun installProjectAndroidSdk(execOperations: ExecOperations) {
 
     writeAndroidLocalProperties()
     androidSdkInstallMarker.writeText("")
+    if (!isProjectAndroidSdkInstalled()) {
+        val missingPackageDirs = requiredAndroidSdkPackageDirs
+            .filterNot { it.exists() }
+            .joinToString(separator = "\n") { "  - $it" }
+        throw GradleException("Android SDK setup finished but required package dirs are missing:\n$missingPackageDirs")
+    }
     println("setup-android-sdk: done")
     println("  SDK at:     $projectAndroidSdkDir")
     println("  configured: local.properties -> $projectAndroidSdkDir")

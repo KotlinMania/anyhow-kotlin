@@ -17,6 +17,8 @@ public class Chain internal constructor(
         return Pair(len, len)
     }
 
+    public fun clone(): Chain = chainClone(this)
+
     public companion object {
         public fun new(head: StdError): Chain = chainNew(head)
 
@@ -85,6 +87,15 @@ internal fun chainLen(chain: Chain): Int = when (val s = chain.state) {
         len
     }
     is ChainState.Buffered -> s.rest.size
+}
+
+internal fun chainClone(chain: Chain): Chain = when (val s = chain.state) {
+    is ChainState.Linked -> Chain(
+        state = ChainState.Linked(next = s.next),
+    )
+    is ChainState.Buffered -> Chain(
+        state = ChainState.Buffered(rest = ArrayDeque<StdError>().also { it.addAll(s.rest) }),
+    )
 }
 
 internal fun chainDefault(): Chain = Chain(
