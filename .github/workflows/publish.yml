@@ -19,7 +19,7 @@ permissions:
 jobs:
   publish:
     name: Publish to Maven Central
-    runs-on: macos-latest
+    runs-on: macos-26
 
     permissions:
       contents: read
@@ -63,7 +63,7 @@ jobs:
 
       - name: Publish to Maven Central
         if: ${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
-        run: ./gradlew setupAndroidSdk publishAndReleaseToMavenCentral --no-configuration-cache
+        run: ./gradlew setupAndroidSdk test publishAndReleaseToMavenCentral --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_kotlin_js_yarn_download: "false"
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
