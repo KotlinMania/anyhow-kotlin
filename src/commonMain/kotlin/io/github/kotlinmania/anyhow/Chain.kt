@@ -1,6 +1,12 @@
+@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
+
 // port-lint: source chain.rs
+
 package io.github.kotlinmania.anyhow
 
+import kotlin.native.HiddenFromObjC
+
+@HiddenFromObjC
 public class Chain internal constructor(
     internal var state: ChainState,
 ) : Iterator<StdError> {
@@ -36,14 +42,17 @@ internal sealed class ChainState {
     ) : ChainState()
 }
 
-public fun chainNew(head: StdError): Chain = Chain(
-    state = ChainState.Linked(next = head),
-)
+@HiddenFromObjC
+public fun chainNew(head: StdError): Chain =
+    Chain(
+        state = ChainState.Linked(next = head),
+    )
 
-internal fun chainHasNext(chain: Chain): Boolean = when (val s = chain.state) {
-    is ChainState.Linked -> s.next != null
-    is ChainState.Buffered -> s.rest.isNotEmpty()
-}
+internal fun chainHasNext(chain: Chain): Boolean =
+    when (val s = chain.state) {
+        is ChainState.Linked -> s.next != null
+        is ChainState.Buffered -> s.rest.isNotEmpty()
+    }
 
 internal fun chainNext(chain: Chain): StdError {
     when (val s = chain.state) {
@@ -59,8 +68,8 @@ internal fun chainNext(chain: Chain): StdError {
     }
 }
 
-internal fun chainNextBack(chain: Chain): StdError? {
-    return when (val s = chain.state) {
+internal fun chainNextBack(chain: Chain): StdError? =
+    when (val s = chain.state) {
         is ChainState.Linked -> {
             val rest = ArrayDeque<StdError>()
             var next: StdError? = s.next
@@ -74,30 +83,34 @@ internal fun chainNextBack(chain: Chain): StdError? {
         }
         is ChainState.Buffered -> s.rest.removeLastOrNull()
     }
-}
 
-internal fun chainLen(chain: Chain): Int = when (val s = chain.state) {
-    is ChainState.Linked -> {
-        var len = 0
-        var next: StdError? = s.next
-        while (next != null) {
-            len += 1
-            next = next.source()
+internal fun chainLen(chain: Chain): Int =
+    when (val s = chain.state) {
+        is ChainState.Linked -> {
+            var len = 0
+            var next: StdError? = s.next
+            while (next != null) {
+                len += 1
+                next = next.source()
+            }
+            len
         }
-        len
+        is ChainState.Buffered -> s.rest.size
     }
-    is ChainState.Buffered -> s.rest.size
-}
 
-internal fun chainClone(chain: Chain): Chain = when (val s = chain.state) {
-    is ChainState.Linked -> Chain(
-        state = ChainState.Linked(next = s.next),
-    )
-    is ChainState.Buffered -> Chain(
-        state = ChainState.Buffered(rest = ArrayDeque<StdError>().also { it.addAll(s.rest) }),
-    )
-}
+internal fun chainClone(chain: Chain): Chain =
+    when (val s = chain.state) {
+        is ChainState.Linked ->
+            Chain(
+                state = ChainState.Linked(next = s.next),
+            )
+        is ChainState.Buffered ->
+            Chain(
+                state = ChainState.Buffered(rest = ArrayDeque<StdError>().also { it.addAll(s.rest) }),
+            )
+    }
 
-internal fun chainDefault(): Chain = Chain(
-    state = ChainState.Buffered(rest = ArrayDeque()),
-)
+internal fun chainDefault(): Chain =
+    Chain(
+        state = ChainState.Buffered(rest = ArrayDeque()),
+    )

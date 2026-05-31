@@ -5,13 +5,10 @@ internal interface BothDebug {
     fun dispatchEnsure(msg: String): Error
 }
 
-internal fun <A, B> bothDebug(pair: Pair<A, B>): BothDebug {
-    return object : BothDebug {
-        override fun dispatchEnsure(msg: String): Error {
-            return render(msg, pair.first, pair.second)
-        }
+internal fun <A, B> bothDebug(pair: Pair<A, B>): BothDebug =
+    object : BothDebug {
+        override fun dispatchEnsure(msg: String): Error = render(msg, pair.first, pair.second)
     }
-}
 
 internal interface NotBothDebug {
     fun dispatchEnsure(msg: String): Error
@@ -45,8 +42,12 @@ private class Buf {
     }
 }
 
-private fun render(msg: String, lhs: Any?, rhs: Any?): Error {
-    return try {
+private fun render(
+    msg: String,
+    lhs: Any?,
+    rhs: Any?,
+): Error =
+    try {
         val lhsBuf = Buf()
         lhsBuf.writeString(lhs.toString())
 
@@ -59,7 +60,6 @@ private fun render(msg: String, lhs: Any?, rhs: Any?): Error {
     } catch (_: IllegalArgumentException) {
         Error.msg(msg)
     }
-}
 
 internal fun <L, R> fancyEnsure(
     lhs: L,

@@ -1,7 +1,10 @@
 // port-lint: source fmt.rs
 package io.github.kotlinmania.anyhow
 
-internal fun display(thisRef: Ref<ErrorImpl>, alternate: Boolean): String {
+internal fun display(
+    thisRef: Ref<ErrorImpl>,
+    alternate: Boolean,
+): String {
     val out = StringBuilder()
     val error = errorImplError(thisRef)
     out.append(error.toString())
@@ -22,7 +25,10 @@ internal fun display(thisRef: Ref<ErrorImpl>, alternate: Boolean): String {
     return out.toString()
 }
 
-internal fun debug(thisRef: Ref<ErrorImpl>, alternate: Boolean): String {
+internal fun debug(
+    thisRef: Ref<ErrorImpl>,
+    alternate: Boolean,
+): String {
     val out = StringBuilder()
     val error = errorImplError(thisRef)
 
@@ -41,11 +47,12 @@ internal fun debug(thisRef: Ref<ErrorImpl>, alternate: Boolean): String {
         val chain = chainNew(cause)
         for (err in chain) {
             out.append('\n')
-            val indented = Indented(
-                inner = out,
-                number = if (multiple) index else null,
-                started = false,
-            )
+            val indented =
+                Indented(
+                    inner = out,
+                    number = if (multiple) index else null,
+                    started = false,
+                )
             indented.writeStr(err.toString())
             index += 1
         }

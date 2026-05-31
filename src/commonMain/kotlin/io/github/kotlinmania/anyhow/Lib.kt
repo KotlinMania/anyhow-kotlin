@@ -1,7 +1,12 @@
+@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
+
 // port-lint: source lib.rs
+
 package io.github.kotlinmania.anyhow
 
-/**
+import kotlin.native.HiddenFromObjC
+
+/*
  * This library provides [Error], a dynamic error type for easy idiomatic error handling
  * in Kotlin applications.
  *
@@ -67,14 +72,11 @@ package io.github.kotlinmania.anyhow
  * Kotlin/Native, Kotlin/JVM, and Kotlin/JS runtimes.
  */
 
-// Re-exports tracked but not bridged via typealias — see workspace CLAUDE.md.
-// pub use anyhow as format_err;
-// Callers migrated:
-
 /**
  * A minimal "standard error" abstraction used throughout the anyhow library.
  * Provides a [source] chain for causal errors.
  */
+@HiddenFromObjC
 public interface StdError {
     public fun source(): StdError? = null
 }
@@ -135,9 +137,11 @@ public interface StdError {
  * }
  * ```
  */
+@HiddenFromObjC
 public class Error internal constructor(
     internal val inner: Own<ErrorImpl>,
-) : Throwable(), StdError {
+) : Throwable(),
+    StdError {
     override fun source(): StdError? = errorSource(this)
 
     override fun toString(): String = display(inner.byRef(), alternate = false)
@@ -225,6 +229,7 @@ public typealias Result<T> = kotlin.Result<T>
  *   }
  *   ```
  */
+@HiddenFromObjC
 public interface Context<T, E> {
     /**
      * Wrap the error value with additional context.
@@ -242,9 +247,11 @@ public interface Context<T, E> {
  * Equivalent to `Result.success(value)` for an anyhow [Result], with the failure
  * type pinned to [Error] without explicit type arguments.
  */
+@HiddenFromObjC
 public fun <T> Ok(value: T): Result<T> = Result.success(value)
 
 // Not public API. Used by the [anyhow], [bail], and [ensure] helpers.
+@HiddenFromObjC
 public object __private {
     public fun formatErr(message: String): Error = anyhow(message)
 
