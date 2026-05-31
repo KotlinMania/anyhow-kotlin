@@ -1,12 +1,16 @@
+@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
+
 // port-lint: source backtrace.rs
+
 package io.github.kotlinmania.anyhow
 
+import kotlin.native.HiddenFromObjC
+
+@HiddenFromObjC
 public class Backtrace internal constructor(
     private val captured: String,
 ) {
-    public fun status(): BacktraceStatus {
-        return if (captured.isEmpty()) BacktraceStatus.Unsupported else BacktraceStatus.Captured
-    }
+    public fun status(): BacktraceStatus = if (captured.isEmpty()) BacktraceStatus.Unsupported else BacktraceStatus.Captured
 
     override fun toString(): String {
         val status = status()
@@ -20,6 +24,7 @@ public class Backtrace internal constructor(
     }
 }
 
+@HiddenFromObjC
 public enum class BacktraceStatus {
     Unsupported,
     Disabled,
@@ -28,13 +33,10 @@ public enum class BacktraceStatus {
 
 internal fun backtrace(): Backtrace? = Backtrace.capture()
 
-internal fun backtraceIfAbsent(err: Throwable): Backtrace? {
-    return if (err.stackTraceToString().isEmpty()) backtrace() else null
-}
+internal fun backtraceIfAbsent(err: Throwable): Backtrace? = if (err.stackTraceToString().isEmpty()) backtrace() else null
 
-internal fun backtraceIfAbsent(err: StdError): Backtrace? {
-    return when (err) {
+internal fun backtraceIfAbsent(err: StdError): Backtrace? =
+    when (err) {
         is Throwable -> backtraceIfAbsent(err as Throwable)
         else -> backtrace()
     }
-}

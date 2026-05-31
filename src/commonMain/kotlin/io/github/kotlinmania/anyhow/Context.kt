@@ -1,5 +1,10 @@
+@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
+
 // port-lint: source context.rs
+
 package io.github.kotlinmania.anyhow
+
+import kotlin.native.HiddenFromObjC
 
 internal object ext {
     internal interface StdError {
@@ -16,6 +21,7 @@ internal fun Throwable.extContext(context: Any): Error {
     return Error.constructFromContext(context, throwableAsStdError(this), backtrace)
 }
 
+@HiddenFromObjC
 public fun <T> Result<T>.context(context: Any): Result<T> {
     val ok = getOrNull()
     if (ok != null || isSuccess) {
@@ -26,6 +32,7 @@ public fun <T> Result<T>.context(context: Any): Result<T> {
     return Result.failure(error.extContext(context))
 }
 
+@HiddenFromObjC
 public fun <T> Result<T>.withContext(context: () -> Any): Result<T> {
     val ok = getOrNull()
     if (ok != null || isSuccess) {
@@ -36,19 +43,19 @@ public fun <T> Result<T>.withContext(context: () -> Any): Result<T> {
     return Result.failure(error.extContext(context()))
 }
 
-public fun <T> T?.toResult(context: Any): Result<T> {
-    return when (this) {
+@HiddenFromObjC
+public fun <T> T?.toResult(context: Any): Result<T> =
+    when (this) {
         null -> Result.failure(Error.constructFromDisplay(context, backtrace()))
         else -> Ok(this)
     }
-}
 
-public fun <T> T?.toResultWith(context: () -> Any): Result<T> {
-    return when (this) {
+@HiddenFromObjC
+public fun <T> T?.toResultWith(context: () -> Any): Result<T> =
+    when (this) {
         null -> Result.failure(Error.constructFromDisplay(context(), backtrace()))
         else -> Ok(this)
     }
-}
 
 internal fun <C, E : StdError> contextErrorDebug(contextError: ContextError<C, E>): String {
     val out = StringBuilder()

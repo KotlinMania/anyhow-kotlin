@@ -1,6 +1,10 @@
+@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
+
 // port-lint: source error.rs
+
 package io.github.kotlinmania.anyhow
 
+import kotlin.native.HiddenFromObjC
 import kotlin.reflect.KClass
 
 internal class ErrorVTable(
@@ -42,13 +46,12 @@ internal class ThrowableStdError(
     override fun toString(): String = value.toString()
 }
 
-internal fun throwableAsStdError(throwable: Throwable): StdError {
-    return if (throwable is Error) {
+internal fun throwableAsStdError(throwable: Throwable): StdError =
+    if (throwable is Error) {
         throwable
     } else {
         ThrowableStdError(throwable)
     }
-}
 
 internal fun errorSource(error: Error): StdError? {
     val inner = error.inner.byRef()
@@ -70,6 +73,7 @@ internal fun errorImplBacktrace(thisRef: Ref<ErrorImpl>): Backtrace {
 
 internal fun errorImplChain(thisRef: Ref<ErrorImpl>): Chain = chainNew(errorImplError(thisRef))
 
+@HiddenFromObjC
 public fun Error.context(context: Any): Error {
     val error: ContextError<Any, Error> = ContextError(context, this)
 
@@ -87,32 +91,34 @@ public fun Error.context(context: Any): Error {
     return construct(error, vtable, backtrace)
 }
 
-public inline fun <reified E> Error.`is`(): Boolean where E : Any {
-    return isType(E::class)
-}
+@HiddenFromObjC
+public inline fun <reified E> Error.`is`(): Boolean where E : Any = isType(E::class)
 
+@HiddenFromObjC
 public fun Error.isType(type: KClass<*>): Boolean = downcastRef(type) != null
 
+@HiddenFromObjC
 public inline fun <reified E : Any> Error.downcast(): Result<E> {
     val value = downcastRef<E>()
     return if (value != null) Result.success(value) else Result.failure(this)
 }
 
+@HiddenFromObjC
 public inline fun <reified E : Any> Error.downcastRef(): E? {
     val addr = downcastRef(E::class) ?: return null
     return addr as? E
 }
 
+@HiddenFromObjC
 public inline fun <reified E : Any> Error.downcastMut(): E? = downcastRef()
 
-public fun Error.downcastRef(type: KClass<*>): Any? {
-    return vtable(inner.ptr).objectDowncast(inner.byRef(), type)
-}
+@HiddenFromObjC
+public fun Error.downcastRef(type: KClass<*>): Any? = vtable(inner.ptr).objectDowncast(inner.byRef(), type)
 
-public fun Error.chain(): Chain {
-    return errorImplChain(inner.byRef())
-}
+@HiddenFromObjC
+public fun Error.chain(): Chain = errorImplChain(inner.byRef())
 
+@HiddenFromObjC
 public fun Error.rootCause(): StdError {
     var last: StdError? = null
     for (cause in chain()) {
@@ -121,39 +127,43 @@ public fun Error.rootCause(): StdError {
     return last ?: this
 }
 
-public fun Error.backtrace(): Backtrace {
-    return errorImplBacktrace(inner.byRef())
-}
+@HiddenFromObjC
+public fun Error.backtrace(): Backtrace = errorImplBacktrace(inner.byRef())
 
-public fun Error.debugString(alternate: Boolean = false): String {
-    return debug(inner.byRef(), alternate = alternate)
-}
+@HiddenFromObjC
+public fun Error.debugString(alternate: Boolean = false): String = debug(inner.byRef(), alternate = alternate)
 
+@HiddenFromObjC
 public fun Error.intoBoxedDynError(): StdError {
     val outer = this
     return vtable(outer.inner.ptr).objectBoxed(outer.inner)
 }
 
+@HiddenFromObjC
 public fun Error.reallocateIntoBoxedDynErrorWithoutBacktrace(): StdError {
     val outer = this
     return vtable(outer.inner.ptr).objectReallocateBoxed(outer.inner)
 }
 
+@HiddenFromObjC
 public fun Error.Companion.new(error: StdError): Error {
     val backtrace = backtraceIfAbsent(error) ?: backtrace()
     return constructFromStd(error, backtrace)
 }
 
-public fun Error.Companion.msg(message: Any): Error {
-    return constructFromAdhoc(message, backtrace())
-}
+@HiddenFromObjC
+public fun Error.Companion.msg(message: Any): Error = constructFromAdhoc(message, backtrace())
 
+@HiddenFromObjC
 public fun Error.Companion.fromBoxed(boxedError: StdError): Error {
     val backtrace = backtraceIfAbsent(boxedError) ?: backtrace()
     return constructFromBoxed(boxedError, backtrace)
 }
 
-internal fun Error.Companion.constructFromStd(error: StdError, backtrace: Backtrace?): Error {
+internal fun Error.Companion.constructFromStd(
+    error: StdError,
+    backtrace: Backtrace?,
+): Error {
     val vtable =
         ErrorVTable(
             objectRef = { e -> objectRef(e) },
@@ -167,7 +177,10 @@ internal fun Error.Companion.constructFromStd(error: StdError, backtrace: Backtr
     return construct(error, vtable, backtrace)
 }
 
-internal fun Error.Companion.constructFromAdhoc(message: Any, backtrace: Backtrace?): Error {
+internal fun Error.Companion.constructFromAdhoc(
+    message: Any,
+    backtrace: Backtrace?,
+): Error {
     val error: MessageError<Any> = MessageError(message)
 
     val vtable =
@@ -183,7 +196,10 @@ internal fun Error.Companion.constructFromAdhoc(message: Any, backtrace: Backtra
     return construct(error, vtable, backtrace)
 }
 
-internal fun Error.Companion.constructFromDisplay(message: Any, backtrace: Backtrace?): Error {
+internal fun Error.Companion.constructFromDisplay(
+    message: Any,
+    backtrace: Backtrace?,
+): Error {
     val error: DisplayError<Any> = DisplayError(message)
 
     val vtable =
@@ -199,7 +215,11 @@ internal fun Error.Companion.constructFromDisplay(message: Any, backtrace: Backt
     return construct(error, vtable, backtrace)
 }
 
-internal fun Error.Companion.constructFromContext(context: Any, error: StdError, backtrace: Backtrace?): Error {
+internal fun Error.Companion.constructFromContext(
+    context: Any,
+    error: StdError,
+    backtrace: Backtrace?,
+): Error {
     val ctx: ContextError<Any, StdError> = ContextError(context, error)
 
     val vtable =
@@ -215,7 +235,10 @@ internal fun Error.Companion.constructFromContext(context: Any, error: StdError,
     return construct(ctx, vtable, backtrace)
 }
 
-internal fun Error.Companion.constructFromBoxed(error: StdError, backtrace: Backtrace?): Error {
+internal fun Error.Companion.constructFromBoxed(
+    error: StdError,
+    backtrace: Backtrace?,
+): Error {
     val boxed = BoxedError(error)
 
     val vtable =
@@ -231,7 +254,11 @@ internal fun Error.Companion.constructFromBoxed(error: StdError, backtrace: Back
     return construct(boxed, vtable, backtrace)
 }
 
-private fun construct(error: StdError, vtable: ErrorVTable, backtrace: Backtrace?): Error {
+private fun construct(
+    error: StdError,
+    vtable: ErrorVTable,
+    backtrace: Backtrace?,
+): Error {
     val inner = Own.new(ErrorImpl(vtable = vtable, backtrace = backtrace, `object` = error))
     return Error(inner)
 }
@@ -250,39 +277,60 @@ private fun objectBoxed(e: Own<ErrorImpl>): StdError = e.ptr.`object`
 
 private fun objectReallocateBoxed(e: Own<ErrorImpl>): StdError = e.ptr.`object`
 
-private fun objectDowncast(e: Ref<ErrorImpl>, target: KClass<*>): Any? {
+private fun objectDowncast(
+    e: Ref<ErrorImpl>,
+    target: KClass<*>,
+): Any? {
     val value = e.ptr.`object`
     return if (target.isInstance(value)) value else null
 }
 
-private fun objectDropFront(e: Own<ErrorImpl>, target: KClass<*>) {
+private fun objectDropFront(
+    e: Own<ErrorImpl>,
+    target: KClass<*>,
+) {
     val _target = target
     val _e = e
 }
 
-private fun objectDowncastMessage(e: Ref<ErrorImpl>, target: KClass<*>): Any? {
+private fun objectDowncastMessage(
+    e: Ref<ErrorImpl>,
+    target: KClass<*>,
+): Any? {
     val obj = e.ptr.`object` as MessageError<*>
     val value = obj.value
     return if (target.isInstance(value)) value else null
 }
 
-private fun objectDropFrontMessage(e: Own<ErrorImpl>, target: KClass<*>) {
+private fun objectDropFrontMessage(
+    e: Own<ErrorImpl>,
+    target: KClass<*>,
+) {
     val _target = target
     val _e = e
 }
 
-private fun objectDowncastDisplay(e: Ref<ErrorImpl>, target: KClass<*>): Any? {
+private fun objectDowncastDisplay(
+    e: Ref<ErrorImpl>,
+    target: KClass<*>,
+): Any? {
     val obj = e.ptr.`object` as DisplayError<*>
     val value = obj.value
     return if (target.isInstance(value)) value else null
 }
 
-private fun objectDropFrontDisplay(e: Own<ErrorImpl>, target: KClass<*>) {
+private fun objectDropFrontDisplay(
+    e: Own<ErrorImpl>,
+    target: KClass<*>,
+) {
     val _target = target
     val _e = e
 }
 
-private fun contextDowncast(e: Ref<ErrorImpl>, target: KClass<*>): Any? {
+private fun contextDowncast(
+    e: Ref<ErrorImpl>,
+    target: KClass<*>,
+): Any? {
     val ctx = e.ptr.`object` as ContextError<*, *>
     val context = ctx.context
     if (target.isInstance(context)) return context
@@ -291,31 +339,41 @@ private fun contextDowncast(e: Ref<ErrorImpl>, target: KClass<*>): Any? {
     return if (target.isInstance(error)) error else null
 }
 
-private fun contextDropRest(e: Own<ErrorImpl>, target: KClass<*>) {
+private fun contextDropRest(
+    e: Own<ErrorImpl>,
+    target: KClass<*>,
+) {
     val _target = target
     val _e = e
 }
 
-private fun objectDowncastBoxed(e: Ref<ErrorImpl>, target: KClass<*>): Any? {
+private fun objectDowncastBoxed(
+    e: Ref<ErrorImpl>,
+    target: KClass<*>,
+): Any? {
     val boxed = e.ptr.`object` as BoxedError
     val value = boxed.value
     return if (target.isInstance(value)) value else null
 }
 
-private fun objectDropFrontBoxed(e: Own<ErrorImpl>, target: KClass<*>) {
+private fun objectDropFrontBoxed(
+    e: Own<ErrorImpl>,
+    target: KClass<*>,
+) {
     val _target = target
     val _e = e
 }
 
-private fun contextChainObjectRef(e: Ref<ErrorImpl>): StdError {
-    return e.ptr.`object`
-}
+private fun contextChainObjectRef(e: Ref<ErrorImpl>): StdError = e.ptr.`object`
 
 private fun contextChainObjectBoxed(e: Own<ErrorImpl>): StdError = e.ptr.`object`
 
 private fun contextChainObjectReallocateBoxed(e: Own<ErrorImpl>): StdError = e.ptr.`object`
 
-private fun contextChainDowncast(e: Ref<ErrorImpl>, target: KClass<*>): Any? {
+private fun contextChainDowncast(
+    e: Ref<ErrorImpl>,
+    target: KClass<*>,
+): Any? {
     val ctx = e.ptr.`object` as ContextError<*, *>
     val context = ctx.context
     if (target.isInstance(context)) return context
@@ -324,7 +382,10 @@ private fun contextChainDowncast(e: Ref<ErrorImpl>, target: KClass<*>): Any? {
     return vtable(source.inner.ptr).objectDowncast(source.inner.byRef(), target)
 }
 
-private fun contextChainDropRest(e: Own<ErrorImpl>, target: KClass<*>) {
+private fun contextChainDropRest(
+    e: Own<ErrorImpl>,
+    target: KClass<*>,
+) {
     val _target = target
     val _e = e
 }
