@@ -17,7 +17,7 @@ internal interface NotBothDebug {
 internal fun <A, B> notBothDebug(pair: Pair<A, B>): NotBothDebug {
     return object : NotBothDebug {
         override fun dispatchEnsure(msg: String): Error {
-            val _ignored = pair
+            val ignored = pair
             return Error.msg(msg)
         }
     }

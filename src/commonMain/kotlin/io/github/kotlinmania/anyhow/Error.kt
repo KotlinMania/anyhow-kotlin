@@ -289,8 +289,8 @@ private fun objectDropFront(
     e: Own<ErrorImpl>,
     target: KClass<*>,
 ) {
-    val _target = target
-    val _e = e
+    val targetVal = target
+    val eVal = e
 }
 
 private fun objectDowncastMessage(
@@ -306,8 +306,8 @@ private fun objectDropFrontMessage(
     e: Own<ErrorImpl>,
     target: KClass<*>,
 ) {
-    val _target = target
-    val _e = e
+    val targetVal = target
+    val eVal = e
 }
 
 private fun objectDowncastDisplay(
@@ -323,8 +323,8 @@ private fun objectDropFrontDisplay(
     e: Own<ErrorImpl>,
     target: KClass<*>,
 ) {
-    val _target = target
-    val _e = e
+    val targetVal = target
+    val eVal = e
 }
 
 private fun contextDowncast(
@@ -343,8 +343,8 @@ private fun contextDropRest(
     e: Own<ErrorImpl>,
     target: KClass<*>,
 ) {
-    val _target = target
-    val _e = e
+    val targetVal = target
+    val eVal = e
 }
 
 private fun objectDowncastBoxed(
@@ -360,8 +360,8 @@ private fun objectDropFrontBoxed(
     e: Own<ErrorImpl>,
     target: KClass<*>,
 ) {
-    val _target = target
-    val _e = e
+    val targetVal = target
+    val eVal = e
 }
 
 private fun contextChainObjectRef(e: Ref<ErrorImpl>): StdError = e.ptr.`object`
@@ -386,8 +386,8 @@ private fun contextChainDropRest(
     e: Own<ErrorImpl>,
     target: KClass<*>,
 ) {
-    val _target = target
-    val _e = e
+    val targetVal = target
+    val eVal = e
 }
 
 private fun contextChainBacktrace(e: Ref<ErrorImpl>): Backtrace? {
