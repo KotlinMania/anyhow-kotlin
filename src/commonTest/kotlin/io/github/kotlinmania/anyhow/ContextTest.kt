@@ -17,15 +17,21 @@ class ContextTest {
         assertEquals(1, result.getOrNull())
     }
 
-    private class HighLevel(val message: String) : StdError {
+    private class HighLevel(
+        val message: String,
+    ) : StdError {
         override fun toString(): String = message
     }
 
-    private class MidLevel(val message: String) : StdError {
+    private class MidLevel(
+        val message: String,
+    ) : StdError {
         override fun toString(): String = message
     }
 
-    private class LowLevel(val message: String) : StdError {
+    private class LowLevel(
+        val message: String,
+    ) : StdError {
         override fun toString(): String = message
     }
 

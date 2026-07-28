@@ -2,7 +2,6 @@
 package io.github.kotlinmania.anyhow
 
 import kotlin.concurrent.atomics.AtomicBoolean
-import kotlin.test.assertTrue
 
 /**
  * Shared flag that tracks whether the associated [DetectDrop] has been
@@ -25,7 +24,8 @@ internal class Flag {
  */
 internal class DetectDrop(
     private val hasDropped: Flag,
-) : StdError, AutoCloseable {
+) : StdError,
+    AutoCloseable {
     override fun toString(): String = "oh no!"
 
     override fun close() {

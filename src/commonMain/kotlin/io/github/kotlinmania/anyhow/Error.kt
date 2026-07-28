@@ -131,6 +131,9 @@ public fun Error.rootCause(): StdError {
 public fun Error.backtrace(): Backtrace = errorImplBacktrace(inner.byRef())
 
 @HiddenFromObjC
+public fun Error.displayString(alternate: Boolean = false): String = display(inner.byRef(), alternate = alternate)
+
+@HiddenFromObjC
 public fun Error.debugString(alternate: Boolean = false): String = debug(inner.byRef(), alternate = alternate)
 
 @HiddenFromObjC

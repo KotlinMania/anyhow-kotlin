@@ -3,7 +3,6 @@ package io.github.kotlinmania.anyhow
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 internal fun bailLiteral(): Result<Unit> = bail("oh no!")
 
