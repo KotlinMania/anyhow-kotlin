@@ -206,7 +206,7 @@ be dual licensed as above, without any additional terms or conditions.
 
 ```kotlin
 dependencies {
-    implementation("io.github.kotlinmania:anyhow-kotlin:0.1.1")
+    implementation("io.github.kotlinmania:anyhow-kotlin:0.1.0")
 }
 ```
 
