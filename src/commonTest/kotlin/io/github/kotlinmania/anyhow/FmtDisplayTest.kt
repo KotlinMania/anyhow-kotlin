@@ -52,8 +52,33 @@ class FmtDisplayTest {
     // In Rust the debug format does not include a backtrace by default.
     // In Kotlin a backtrace is always captured, so the debug output is
     // "<error and causes>\n\n<backtrace>". This strips the backtrace tail.
+    // The backtrace section is the last "\n\n"-separated block that is NOT
+    // part of the "Caused by:" cause chain. The cause chain lines are indented
+    // (start with spaces) or are the "Caused by:" header; the backtrace starts
+    // with a non-indented line.
     private fun stripBacktrace(s: String): String {
-        val lastSeparator = s.lastIndexOf("\n\n")
-        return if (lastSeparator >= 0) s.substring(0, lastSeparator) else s
+        val causedByIndex = s.indexOf("Caused by:")
+        if (causedByIndex == -1) {
+            // No cause chain — the backtrace (if any) follows the error message.
+            val separator = s.indexOf("\n\n")
+            return if (separator >= 0) s.substring(0, separator) else s
+        }
+        // After "Caused by:", find the backtrace section: it starts with "\n\n"
+        // followed by a non-indented line (not starting with a space or digit).
+        val afterCausedBy = causedByIndex + "Caused by:".length
+        val rest = s.substring(afterCausedBy)
+        var searchFrom = 0
+        while (true) {
+            val nextSeparator = rest.indexOf("\n\n", searchFrom)
+            if (nextSeparator == -1) return s
+            val afterSeparator = nextSeparator + 2
+            val lineStart = rest.substring(afterSeparator)
+            // Cause lines start with spaces (indented) or are empty;
+            // backtrace lines start with a non-whitespace character.
+            if (lineStart.isNotEmpty() && !lineStart.startsWith(" ") && !lineStart.startsWith("\t")) {
+                return s.substring(0, afterCausedBy + nextSeparator)
+            }
+            searchFrom = nextSeparator + 1
+        }
     }
 }
