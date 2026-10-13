@@ -1,9 +1,8 @@
+import Testing
 import Anyhow
 
-@main
-struct AnyhowExportTests {
-    static func main() {
-        print("Anyhow swift module imported cleanly")
+@Suite struct AnyhowExportTests {
+    @Test func testSwiftModuleLoads() throws {
+        #expect(Bool(true), "Anyhow swift module imported cleanly")
     }
 }
-
