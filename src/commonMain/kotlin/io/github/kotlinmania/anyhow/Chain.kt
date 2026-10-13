@@ -61,6 +61,7 @@ internal fun chainNext(chain: Chain): StdError {
             s.next = error.source()
             return error
         }
+
         is ChainState.Buffered -> {
             val next = s.rest.removeFirstOrNull()
             return next ?: throw NoSuchElementException()
@@ -81,7 +82,10 @@ internal fun chainNextBack(chain: Chain): StdError? =
             chain.state = ChainState.Buffered(rest = rest)
             last
         }
-        is ChainState.Buffered -> s.rest.removeLastOrNull()
+
+        is ChainState.Buffered -> {
+            s.rest.removeLastOrNull()
+        }
     }
 
 internal fun chainLen(chain: Chain): Int =
@@ -95,19 +99,25 @@ internal fun chainLen(chain: Chain): Int =
             }
             len
         }
-        is ChainState.Buffered -> s.rest.size
+
+        is ChainState.Buffered -> {
+            s.rest.size
+        }
     }
 
 internal fun chainClone(chain: Chain): Chain =
     when (val s = chain.state) {
-        is ChainState.Linked ->
+        is ChainState.Linked -> {
             Chain(
                 state = ChainState.Linked(next = s.next),
             )
-        is ChainState.Buffered ->
+        }
+
+        is ChainState.Buffered -> {
             Chain(
                 state = ChainState.Buffered(rest = ArrayDeque<StdError>().also { it.addAll(s.rest) }),
             )
+        }
     }
 
 internal fun chainDefault(): Chain =
