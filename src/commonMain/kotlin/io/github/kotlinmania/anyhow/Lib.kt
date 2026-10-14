@@ -250,10 +250,24 @@ public interface Context<T, E> {
 @HiddenFromObjC
 public fun <T> Ok(value: T): Result<T> = Result.success(value)
 
+internal interface Bool {
+    fun not(): Boolean
+}
+
+internal fun formatErr(message: String): Error = anyhow(message)
+
+internal fun mustUse(error: Error): Error = error
+
+internal fun not(cond: Bool): Boolean = cond.not()
+
+internal fun not(cond: Boolean): Boolean = !cond
+
 // Not public API. Used by the [anyhow], [bail], and [ensure] helpers.
 @HiddenFromObjC
 public object __private {
-    public fun formatErr(message: String): Error = anyhow(message)
+    public typealias Chain = io.github.kotlinmania.anyhow.Chain
+
+    public fun formatErr(message: String): Error = Error.msg(message)
 
     public fun mustUse(error: Error): Error = error
 

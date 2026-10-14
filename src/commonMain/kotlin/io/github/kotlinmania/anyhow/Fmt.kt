@@ -44,7 +44,7 @@ internal fun debug(
         out.append("\n\nCaused by:")
         val multiple = cause.source() != null
         var index = 0
-        val chain = chainNew(cause)
+        val chain = Chain.new(cause)
         for (err in chain) {
             out.append('\n')
             val indented =
@@ -68,31 +68,31 @@ internal fun debug(
 }
 
 internal class Indented(
-    private val inner: Appendable,
-    private val number: Int?,
-    private var started: Boolean,
-) {
-    fun writeStr(s: String) {
-        val lines = s.split('\n')
-        for ((i, line) in lines.withIndex()) {
-            if (!started) {
-                started = true
-                if (number != null) {
-                    inner.append(number.toString().padStart(5, ' '))
-                    inner.append(": ")
-                } else {
-                    inner.append("    ")
-                }
-            } else if (i > 0) {
-                inner.append('\n')
-                if (number != null) {
-                    inner.append("       ")
-                } else {
-                    inner.append("    ")
-                }
-            }
+    internal val inner: Appendable,
+    internal val number: Int?,
+    internal var started: Boolean,
+)
 
-            inner.append(line)
+internal fun Indented.writeStr(s: String) {
+    val lines = s.split('\n')
+    for ((i, line) in lines.withIndex()) {
+        if (!started) {
+            started = true
+            if (number != null) {
+                inner.append(number.toString().padStart(5, ' '))
+                inner.append(": ")
+            } else {
+                inner.append("    ")
+            }
+        } else if (i > 0) {
+            inner.append('\n')
+            if (number != null) {
+                inner.append("       ")
+            } else {
+                inner.append("    ")
+            }
         }
+
+        inner.append(line)
     }
 }
