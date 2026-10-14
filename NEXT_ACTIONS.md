@@ -5,11 +5,11 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 12/12 (100.0%)
-- **Function parity:** 85/149 matched (target 149) — 57.0%
-- **Class/type parity:** 31/43 matched (target 44) — 72.1%
-- **Combined symbol parity:** 116/192 matched (target 193) — 60.4%
-- **Average inline-code cosine:** 0.12 (function body across 12 matched files)
-- **Average documentation cosine:** 0.11 (doc text across 12 matched files)
+- **Function parity:** 149/149 matched (target 213) — 100.0%
+- **Class/type parity:** 43/43 matched (target 60) — 100.0%
+- **Combined symbol parity:** 192/192 matched (target 273) — 100.0%
+- **Average inline-code cosine:** 0.21 (function body across 12 matched files)
+- **Average documentation cosine:** 0.20 (doc text across 12 matched files)
 - **Cheat-zeroed Files:** 1
 - **Critical Issues:** 12 files with <0.60 function similarity
 - **Needs Review:** 0 files with 0.60-0.84 function similarity
@@ -32,46 +32,46 @@ Every matched file is listed below with function and type symbol parity.
 ### 1. error
 
 - **Target:** `anyhow.Error`
-- **Similarity:** 0.10
+- **Similarity:** 0.26
 - **Dependents:** 3
-- **Priority Score:** 3265909.0
-- **Functions:** 30/55 matched (target 57)
-- **Missing functions:** `is`, `provide`, `thiserror_provide`, `from`, `deref`, `deref_mut`, `fmt`, `fmt`, `drop`, `object_drop`, `no_backtrace`, `context_backtrace`, `error`, `error_mut`, `backtrace`, `provide`, `chain`, `provide`, `fmt`, `fmt`, `from`, `from`, `from`, `as_ref`, `as_ref`
-- **Types:** 3/4 matched
-- **Missing types:** `Target`
+- **Priority Score:** 3005907.5
+- **Functions:** 55/55 matched (target 77)
+- **Missing functions:** _none_
+- **Types:** 4/4 matched (target 5)
+- **Missing types:** _none_
 
-### 2. backtrace
-
-- **Target:** `anyhow.Backtrace`
-- **Similarity:** 0.01
-- **Dependents:** 2
-- **Priority Score:** 2192309.8
-- **Functions:** 2/15 matched (target 6)
-- **Missing functions:** `fmt`, `fmt`, `fmt`, `fmt`, `enabled`, `create`, `fmt`, `new`, `force`, `resolve`, `output_filename`, `_assert_send_sync`, `assert`
-- **Types:** 2/8 matched (target 2)
-- **Missing types:** `Inner`, `Capture`, `BacktraceFrame`, `BacktraceSymbol`, `BytesOrWide`, `LazilyResolvedCapture`
-
-### 3. ptr
+### 2. ptr
 
 - **Target:** `anyhow.Ptr`
 - **Similarity:** 0.10
 - **Dependents:** 2
-- **Priority Score:** 2012409.0
+- **Priority Score:** 2002409.0
 - **Functions:** 19/19 matched (target 20)
 - **Missing functions:** _none_
-- **Types:** 4/5 matched (target 4)
-- **Missing types:** `Target`
+- **Types:** 5/5 matched
+- **Missing types:** _none_
+
+### 3. backtrace
+
+- **Target:** `anyhow.Backtrace`
+- **Similarity:** 0.13
+- **Dependents:** 2
+- **Priority Score:** 2002308.8
+- **Functions:** 15/15 matched (target 19)
+- **Missing functions:** _none_
+- **Types:** 8/8 matched (target 13)
+- **Missing types:** _none_
 
 ### 4. chain
 
 - **Target:** `anyhow.Chain`
-- **Similarity:** 0.08
+- **Similarity:** 0.25
 - **Dependents:** 2
-- **Priority Score:** 2010909.1
-- **Functions:** 6/6 matched (target 15)
+- **Priority Score:** 2000907.5
+- **Functions:** 6/6 matched (target 9)
 - **Missing functions:** _none_
-- **Types:** 2/3 matched (target 4)
-- **Missing types:** `Item`
+- **Types:** 3/3 matched (target 5)
+- **Missing types:** _none_
 
 ### 5. fmt
 
@@ -88,59 +88,26 @@ Every matched file is listed below with function and type symbol parity.
 ### 6. context
 
 - **Target:** `anyhow.Context`
-- **Similarity:** 0.06
+- **Similarity:** 0.21
 - **Dependents:** 0
-- **Priority Score:** 101709.4
-- **Functions:** 4/14 matched (target 10)
-- **Missing functions:** `ext_context`, `context`, `with_context`, `fmt`, `fmt`, `source`, `provide`, `source`, `provide`, `fmt`
-- **Types:** 3/3 matched (target 8)
+- **Priority Score:** 1707.9
+- **Functions:** 14/14 matched (target 23)
+- **Missing functions:** _none_
+- **Types:** 3/3 matched (target 7)
 - **Missing types:** _none_
 
-### 7. wrapper
-
-- **Target:** `anyhow.Wrapper`
-- **Similarity:** 0.02
-- **Dependents:** 0
-- **Priority Score:** 71109.8
-- **Functions:** 1/8 matched (target 4)
-- **Missing functions:** `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `provide`
-- **Types:** 3/3 matched
-- **Missing types:** _none_
-
-### 8. nightly
-
-- **Target:** `anyhow.Nightly`
-- **Similarity:** 0.16
-- **Dependents:** 0
-- **Priority Score:** 50808.4
-- **Functions:** 3/7 matched (target 4)
-- **Missing functions:** `fmt`, `fmt`, `request_ref`, `provide`
-- **Types:** 0/1 matched (target 2)
-- **Missing types:** `MyError`
-
-### 9. lib
+### 7. lib
 
 - **Target:** `anyhow.Lib`
-- **Similarity:** 0.25
+- **Similarity:** 0.35
 - **Dependents:** 0
-- **Priority Score:** 41307.5
-- **Functions:** 5/7 matched
-- **Missing functions:** `not`, `not`
-- **Types:** 4/6 matched (target 5)
-- **Missing types:** `Chain`, `Bool`
-
-### 10. ensure
-
-- **Target:** `anyhow.Ensure`
-- **Similarity:** 0.11
-- **Dependents:** 0
-- **Priority Score:** 30908.9
-- **Functions:** 3/6 matched (target 8)
-- **Missing functions:** `new`, `as_str`, `write_str`
-- **Types:** 3/3 matched
+- **Priority Score:** 1306.5
+- **Functions:** 7/7 matched (target 11)
+- **Missing functions:** _none_
+- **Types:** 6/6 matched (target 7)
 - **Missing types:** _none_
 
-### 11. kind
+### 8. kind
 
 - **Target:** `anyhow.Kind`
 - **Similarity:** 0.29
@@ -149,6 +116,39 @@ Every matched file is listed below with function and type symbol parity.
 - **Functions:** 6/6 matched
 - **Missing functions:** _none_
 - **Types:** 6/6 matched (target 7)
+- **Missing types:** _none_
+
+### 9. wrapper
+
+- **Target:** `anyhow.Wrapper`
+- **Similarity:** 0.12
+- **Dependents:** 0
+- **Priority Score:** 1108.8
+- **Functions:** 8/8 matched (target 12)
+- **Missing functions:** _none_
+- **Types:** 3/3 matched
+- **Missing types:** _none_
+
+### 10. ensure
+
+- **Target:** `anyhow.Ensure`
+- **Similarity:** 0.23
+- **Dependents:** 0
+- **Priority Score:** 907.7
+- **Functions:** 6/6 matched (target 11)
+- **Missing functions:** _none_
+- **Types:** 3/3 matched
+- **Missing types:** _none_
+
+### 11. nightly
+
+- **Target:** `anyhow.Nightly`
+- **Similarity:** 0.31
+- **Dependents:** 0
+- **Priority Score:** 806.9
+- **Functions:** 7/7 matched (target 13)
+- **Missing functions:** _none_
+- **Types:** 1/1 matched (target 3)
 - **Missing types:** _none_
 
 ### 12. macros
