@@ -3,7 +3,6 @@
 package io.github.kotlinmania.anyhow
 
 import kotlin.Result
-
 import kotlin.native.HiddenFromObjC
 
 /*
@@ -260,7 +259,6 @@ internal fun not(cond: Boolean): Boolean = !cond
 // Not public API. Used by the [anyhow], [bail], and [ensure] helpers.
 @HiddenFromObjC
 public object __private {
-
     public fun formatErr(message: String): Error = Error.msg(message)
 
     public fun mustUse(error: Error): Error = error
