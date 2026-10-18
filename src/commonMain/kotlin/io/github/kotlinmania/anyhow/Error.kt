@@ -4,6 +4,7 @@
 
 package io.github.kotlinmania.anyhow
 
+import kotlin.Result
 import kotlin.native.HiddenFromObjC
 import kotlin.reflect.KClass
 

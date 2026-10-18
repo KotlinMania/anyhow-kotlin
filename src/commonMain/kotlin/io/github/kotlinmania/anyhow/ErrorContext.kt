@@ -1,9 +1,8 @@
 @file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
 
-// port-lint: source lib.rs
-
 package io.github.kotlinmania.anyhow
 
+import kotlin.Result
 import kotlin.native.HiddenFromObjC
 
 /*
@@ -150,11 +149,6 @@ public class Error internal constructor(
 }
 
 /**
- * Type alias for [kotlin.Result] with failure pinned to [Error].
- */
-public typealias Result<T> = kotlin.Result<T>
-
-/**
  * Provides the `context` method for `Result`.
  *
  * Upstream, this trait is sealed and cannot be implemented for types outside of the library.
@@ -265,8 +259,6 @@ internal fun not(cond: Boolean): Boolean = !cond
 // Not public API. Used by the [anyhow], [bail], and [ensure] helpers.
 @HiddenFromObjC
 public object __private {
-    public typealias Chain = io.github.kotlinmania.anyhow.Chain
-
     public fun formatErr(message: String): Error = Error.msg(message)
 
     public fun mustUse(error: Error): Error = error

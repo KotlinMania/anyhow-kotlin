@@ -1,6 +1,7 @@
 // port-lint: tests tests/test_ffi.rs
 package io.github.kotlinmania.anyhow
 
+import kotlin.Result
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
