@@ -7,7 +7,7 @@
     "Sources/ReverseCallAdapter/ReverseCall.swift": "f2dabd0abb2fa13886ab64960857af7b7a647bfeb0746833f64be2f17e23dd95",
     "Tests/ReverseCallAdapterTests/ReverseCallTests.swift": "8be3041416e8a0e435e0a85c7b5a18a8c3d4fba7cb2d2ace4da59e232e1d6ab2",
     "Package.swift": "342592f7fe2d7f1296a24e80ab4f676a88b00f796576d9ca6dd771f5895b4c6e",
-    "README.md": "f86bc962ccfd05bd44ad7101fd8e7f27b620bacdad1c18b63f7717045875f713"
+    "README.md": "22a6d21adfe79e95ee0f92d32f8a90101ee178995320ae7dccac4e8c3de6ee20"
   },
   "object_compile": {
     "session": 95637,
@@ -19,5 +19,12 @@
   },
   "runtime_validation": "Six cases queued; unexecuted at preservation time",
   "public_callback_contract_preserved": false,
-  "upstream_publication": "Not authorized or completed"
+  "upstream_publication": "Not authorized or completed",
+  "first_runtime_attempt": {
+    "session": 25601,
+    "exit": 1,
+    "tests_executed": 0,
+    "cause": "Missing globalmacOS15target, dependencycompiledmacOS10.13",
+    "source_unchanged": true
+  }
 }

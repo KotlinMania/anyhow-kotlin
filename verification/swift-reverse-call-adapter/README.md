@@ -17,8 +17,10 @@ Use the same coherent Integration Swift package, generated headers, runtime reso
 Set SWIFT_REVERSE_INTEGRATION_PACKAGE to the verified generated Package.swift directory and SWIFT_REVERSE_NATIVE_PRODUCTS to the matching libIntegration.a directory. Then run from this directory:
 
 ```sh
-swift test --verbose -Xswiftc -swift-version -Xswiftc 6 -Xswiftc -warnings-as-errors -Xswiftc -v > swift-tests.log 2>&1
+swift test --verbose -Xswiftc -swift-version -Xswiftc 6 -Xswiftc -warnings-as-errors -Xswiftc -v -Xswiftc -target -Xswiftc arm64-apple-macosx15.0 > swift-tests.log 2>&1
 ```
+
+The explicit deployment target is required for dependency modules too: the first isolated attempt (session25601) omitted it and stopped before tests because a dependency defaulted to macOS10.13. The raw failed attempt is preserved; the corrected run is separate.
 
 Require process exit0, every one of the six named tests passing exactly once, and no skipped tests. Inspect actual swift-frontend product/test commands: every module must use language mode6 and warnings-as-errors. Classify Package.swift configuration commands separately; a test-target flag alone does not prove dependency compilation. Preserve failures and raw logs. The current evidence does not establish foreign completion exactly once, all cancellation/error interleavings, arbitrary actor compatibility, or the original22 reverse bridge behaviors.
 
