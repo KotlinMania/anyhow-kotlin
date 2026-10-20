@@ -10,6 +10,7 @@ ktlint = "14.2.0"
 ktlintEngine = "1.8.0"
 kotlinxBenchmark = "0.5.0"
 thiserror = "0.2.1"
+procMacro = "0.1.4"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -28,6 +29,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "collectionsImmutable" }
 kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlinxBenchmark" }
 thiserror-kotlin = { module = "io.github.kotlinmania:thiserror-kotlin", version.ref = "thiserror" }
+proc-macro-kotlin = { module = "io.github.kotlinmania:proc-macro-kotlin", version.ref = "procMacro" }
 
 [bundles]
 anyhow-commonMain = [
@@ -39,4 +41,5 @@ anyhow-commonMain = [
 ]
 anyhow-commonTest = [
   "thiserror-kotlin",
+  "proc-macro-kotlin",
 ]
