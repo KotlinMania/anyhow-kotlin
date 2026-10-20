@@ -89,7 +89,7 @@ jobs:
 
       - name: Run swift test against Kotlin-exported module
         working-directory: swift-test-harness
-        run: swift test
+        run: swift test -Xswiftc -warnings-as-errors
 
       - name: Upload Swift Export artifacts
         if: success() || failure()
