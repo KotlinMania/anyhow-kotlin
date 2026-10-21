@@ -1,7 +1,6 @@
 // port-lint: tests tests/test_ffi.rs
 package io.github.kotlinmania.anyhow
 
-import kotlin.Result
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -25,7 +24,7 @@ class FfiTest {
     @Test
     fun testErrorFromOption() {
         val error = anyhow("ffi error")
-        val result = Result.failure<Error>(error)
+        val result = Result.err<Error>(error)
         val recovered = result.exceptionOrNull() as Error
         assertEquals("ffi error", recovered.toString())
     }

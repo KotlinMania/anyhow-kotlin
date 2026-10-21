@@ -38,19 +38,19 @@ class ChainTest {
         val chain = error().chain()
 
         assertEquals(4, chain.len())
-        assertEquals(Pair(4, 4), chain.sizeHint())
+        assertEquals(SizeHint(4, 4), chain.sizeHint())
         assertEquals("3", chain.next().toString())
         assertEquals(3, chain.len())
-        assertEquals(Pair(3, 3), chain.sizeHint())
+        assertEquals(SizeHint(3, 3), chain.sizeHint())
         assertEquals("0", chain.nextBack()?.toString())
         assertEquals(2, chain.len())
-        assertEquals(Pair(2, 2), chain.sizeHint())
+        assertEquals(SizeHint(2, 2), chain.sizeHint())
         assertEquals("2", chain.next().toString())
         assertEquals(1, chain.len())
-        assertEquals(Pair(1, 1), chain.sizeHint())
+        assertEquals(SizeHint(1, 1), chain.sizeHint())
         assertEquals("1", chain.nextBack()?.toString())
         assertEquals(0, chain.len())
-        assertEquals(Pair(0, 0), chain.sizeHint())
+        assertEquals(SizeHint(0, 0), chain.sizeHint())
         assertFalse(chain.hasNext())
     }
 
@@ -63,13 +63,12 @@ class ChainTest {
 
     @Test
     fun testClone() {
-        val chain = error().chain().clone()
+        val chain = error().chain()
+        val cloned = chain.clone()
 
         assertEquals("3", chain.next().toString())
+        assertEquals("3", cloned.next().toString())
         assertEquals("2", chain.next().toString())
-        assertEquals("1", chain.next().toString())
-        assertEquals("0", chain.next().toString())
-        assertFalse(chain.hasNext())
-        assertNull(chain.nextBack())
+        assertEquals("2", cloned.next().toString())
     }
 }

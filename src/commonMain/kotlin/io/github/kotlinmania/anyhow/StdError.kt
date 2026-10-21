@@ -1,11 +1,7 @@
-@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
-
 // port-lint: source error.rs
 
 package io.github.kotlinmania.anyhow
 
-import kotlin.Result
-import kotlin.native.HiddenFromObjC
 import kotlin.reflect.KClass
 
 internal typealias Target = StdError
@@ -61,12 +57,7 @@ internal fun ErrorImpl.Companion.backtrace(thisRef: Ref<ErrorImpl>): Backtrace {
     if (direct != null) return direct
 
     val err = error(thisRef)
-    val provided =
-        if (err is Throwable) {
-            Nightly.requestRefBacktrace(err as Throwable)
-        } else {
-            Nightly.requestRefBacktrace(err)
-        }
+    val provided = Nightly.requestRefBacktrace(err)
     return provided ?: vtable(thisRef.ptr).objectBacktrace(thisRef) ?: Backtrace.capture()
 }
 
@@ -106,8 +97,8 @@ internal class ThrowableStdError(
 }
 
 internal fun throwableAsStdError(throwable: Throwable): StdError =
-    if (throwable is Error) {
-        throwable
+    if (throwable is AnyhowException) {
+        throwable.error
     } else {
         ThrowableStdError(throwable)
     }
@@ -130,7 +121,6 @@ internal fun errorImplChain(thisRef: Ref<ErrorImpl>): Chain = ErrorImpl.chain(th
  * For attaching context to a [Result] as it is propagated, the [Context] extension functions
  * may be more convenient than this function.
  */
-@HiddenFromObjC
 public fun Error.context(context: Any): Error {
     val error: ContextError<Any, Error> = ContextError(context, this)
 
@@ -154,27 +144,23 @@ public fun Error.context(context: Any): Error {
  * For errors with context, this method returns true if `E` matches the type of the context `C`
  * **or** the type of the error on which the context has been attached.
  */
-@HiddenFromObjC
 public inline fun <reified E> Error.`is`(): Boolean where E : Any = isType(E::class)
 
 internal inline fun <reified E : Any> Error.is_(): Boolean = isType(E::class)
 
-@HiddenFromObjC
 public fun Error.isType(type: KClass<*>): Boolean = downcastRef(type) != null
 
 /**
  * Attempt to downcast the error object to a concrete type.
  */
-@HiddenFromObjC
-public inline fun <reified E : Any> Error.downcast(): Result<E> {
+public inline fun <reified E : Any> Error.downcast(): Result<E, Error> {
     val value = downcastRef<E>()
-    return if (value != null) Result.success(value) else Result.failure(this)
+    return if (value != null) Result.ok(value) else Result.err(this)
 }
 
 /**
  * Downcast this error object by reference.
  */
-@HiddenFromObjC
 public inline fun <reified E : Any> Error.downcastRef(): E? {
     val addr = downcastRef(E::class) ?: return null
     return addr as? E
@@ -183,10 +169,8 @@ public inline fun <reified E : Any> Error.downcastRef(): E? {
 /**
  * Downcast this error object by mutable reference.
  */
-@HiddenFromObjC
 public inline fun <reified E : Any> Error.downcastMut(): E? = downcastRef()
 
-@HiddenFromObjC
 public fun Error.downcastRef(type: KClass<*>): Any? = vtable(inner.ptr).objectDowncast(inner.byRef(), type)
 
 /**
@@ -195,7 +179,6 @@ public fun Error.downcastRef(type: KClass<*>): Any? = vtable(inner.ptr).objectDo
  * This iterator will visit every error in the cause chain of this error object, beginning with
  * the error that this error object was created from.
  */
-@HiddenFromObjC
 public fun Error.chain(): Chain = ErrorImpl.chain(inner.byRef())
 
 /**
@@ -203,7 +186,6 @@ public fun Error.chain(): Chain = ErrorImpl.chain(inner.byRef())
  *
  * The root cause is the last error in the iterator produced by [chain].
  */
-@HiddenFromObjC
 public fun Error.rootCause(): StdError {
     var last: StdError? = null
     for (cause in chain()) {
@@ -215,19 +197,15 @@ public fun Error.rootCause(): StdError {
 /**
  * Get the backtrace for this [Error].
  */
-@HiddenFromObjC
 public fun Error.backtrace(): Backtrace = ErrorImpl.backtrace(inner.byRef())
 
-@HiddenFromObjC
 public fun Error.displayString(alternate: Boolean = false): String = display(inner.byRef(), alternate = alternate)
 
-@HiddenFromObjC
 public fun Error.debugString(alternate: Boolean = false): String = debug(inner.byRef(), alternate = alternate)
 
 /**
  * Convert to a standard error object.
  */
-@HiddenFromObjC
 public fun Error.intoBoxedDynError(): StdError {
     val outer = this
     return vtable(outer.inner.ptr).objectBoxed(outer.inner)
@@ -236,7 +214,6 @@ public fun Error.intoBoxedDynError(): StdError {
 /**
  * Convert to a standard error object without preserving the collected backtrace.
  */
-@HiddenFromObjC
 public fun Error.reallocateIntoBoxedDynErrorWithoutBacktrace(): StdError {
     val outer = this
     return vtable(outer.inner.ptr).objectReallocateBoxed(outer.inner)
@@ -246,21 +223,17 @@ internal fun Error.provide(request: Nightly.Request) {
     ErrorImpl.provide(inner.byRef(), request)
 }
 
-@HiddenFromObjC
 public fun Error.thiserrorProvide(request: Nightly.Request) {
     provide(request)
 }
 
-@HiddenFromObjC
 public fun Error.Companion.from(error: StdError): Error {
     val backtrace = backtraceIfAbsent(error) ?: backtrace()
     return constructFromStd(error, backtrace)
 }
 
-@HiddenFromObjC
 public fun Error.deref(): Target = ErrorImpl.error(inner.byRef())
 
-@HiddenFromObjC
 public fun Error.derefMut(): Target = ErrorImpl.errorMut(inner.byMut())
 
 internal fun Error.fmt(formatter: Appendable): Appendable = formatter.append(display(inner.byRef(), alternate = false))
@@ -292,7 +265,6 @@ internal fun from(
 
 internal fun from(error: Error): StdError = error.intoBoxedDynError()
 
-@HiddenFromObjC
 public fun Error.asRef(): StdError = deref()
 
 internal fun Error.asRef(sendSync: Boolean): StdError = if (sendSync) deref() else deref()
@@ -300,7 +272,6 @@ internal fun Error.asRef(sendSync: Boolean): StdError = if (sendSync) deref() el
 /**
  * Create a new error object from any error type implementing [StdError].
  */
-@HiddenFromObjC
 public fun Error.Companion.new(error: StdError): Error {
     val backtrace = backtraceIfAbsent(error) ?: backtrace()
     return constructFromStd(error, backtrace)
@@ -309,13 +280,11 @@ public fun Error.Companion.new(error: StdError): Error {
 /**
  * Create a new error object from a printable error message.
  */
-@HiddenFromObjC
 public fun Error.Companion.msg(message: Any): Error = constructFromAdhoc(message, backtrace())
 
 /**
  * Construct an error object from a type-erased standard error.
  */
-@HiddenFromObjC
 public fun Error.Companion.fromBoxed(boxedError: StdError): Error {
     val backtrace = backtraceIfAbsent(boxedError) ?: backtrace()
     return constructFromBoxed(boxedError, backtrace)

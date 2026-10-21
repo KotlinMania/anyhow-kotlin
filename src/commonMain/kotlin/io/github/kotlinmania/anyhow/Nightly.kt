@@ -1,10 +1,6 @@
-@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
-
 // port-lint: source nightly.rs
 
 package io.github.kotlinmania.anyhow
-
-import kotlin.native.HiddenFromObjC
 
 // This code exercises the surface area that we expect of the Error generic
 // member access API.
@@ -46,28 +42,20 @@ internal fun provide(
     Nightly.provide(err, request)
 }
 
-@HiddenFromObjC
 public object Nightly {
     /**
      * Request carrier for error-provided values.
      */
-    @HiddenFromObjC
     public class Request {
         internal var backtrace: Backtrace? = null
 
-        @HiddenFromObjC
         public fun provideRef(backtrace: Backtrace) {
             this.backtrace = backtrace
         }
     }
 
-    @HiddenFromObjC
     public fun requestRefBacktrace(err: StdError): Backtrace? = requestRef<Backtrace>(err)
 
-    @HiddenFromObjC
-    public fun requestRefBacktrace(err: Throwable): Backtrace? = Backtrace(err.stackTraceToString())
-
-    @HiddenFromObjC
     public fun provideRefBacktrace(
         request: Request,
         backtrace: Backtrace,
@@ -75,7 +63,6 @@ public object Nightly {
         request.provideRef(backtrace)
     }
 
-    @HiddenFromObjC
     public fun provide(
         err: StdError,
         request: Request,
@@ -84,15 +71,6 @@ public object Nightly {
             is MyError -> err.provide(request)
             is BoxedError -> err.provide(request)
             is ThrowableStdError -> provideRefBacktrace(request, Backtrace(err.value.stackTraceToString()))
-            is Throwable -> provideRefBacktrace(request, Backtrace(err.stackTraceToString()))
         }
-    }
-
-    @HiddenFromObjC
-    public fun provide(
-        err: Throwable,
-        request: Request,
-    ) {
-        provideRefBacktrace(request, Backtrace(err.stackTraceToString()))
     }
 }

@@ -4,14 +4,14 @@ Based on AST analysis, here are the concrete next steps.
 
 ## Summary
 
-- **Files Present:** 12/12 (100.0%)
-- **Function parity:** 149/149 matched (target 213) — 100.0%
-- **Class/type parity:** 43/43 matched (target 60) — 100.0%
-- **Combined symbol parity:** 192/192 matched (target 273) — 100.0%
-- **Average inline-code cosine:** 0.21 (function body across 12 matched files)
-- **Average documentation cosine:** 0.20 (doc text across 12 matched files)
+- **Files Present:** 11/12 (91.7%)
+- **Function parity:** 142/142 matched (target 202) — 100.0%
+- **Class/type parity:** 37/37 matched (target 53) — 100.0%
+- **Combined symbol parity:** 179/179 matched (target 255) — 100.0%
+- **Average inline-code cosine:** 0.20 (function body across 11 matched files)
+- **Average documentation cosine:** 0.15 (doc text across 11 matched files)
 - **Cheat-zeroed Files:** 1
-- **Critical Issues:** 12 files with <0.60 function similarity
+- **Critical Issues:** 11 files with <0.60 function similarity
 - **Needs Review:** 0 files with 0.60-0.84 function similarity
 - **Excellent:** 0 files with >=0.85 function similarity
 
@@ -96,18 +96,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 3/3 matched (target 7)
 - **Missing types:** _none_
 
-### 7. lib
-
-- **Target:** `anyhow.Lib`
-- **Similarity:** 0.35
-- **Dependents:** 0
-- **Priority Score:** 1306.5
-- **Functions:** 7/7 matched (target 11)
-- **Missing functions:** _none_
-- **Types:** 6/6 matched (target 7)
-- **Missing types:** _none_
-
-### 8. kind
+### 7. kind
 
 - **Target:** `anyhow.Kind`
 - **Similarity:** 0.29
@@ -118,7 +107,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 6/6 matched (target 7)
 - **Missing types:** _none_
 
-### 9. wrapper
+### 8. wrapper
 
 - **Target:** `anyhow.Wrapper`
 - **Similarity:** 0.12
@@ -129,7 +118,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 3/3 matched
 - **Missing types:** _none_
 
-### 10. ensure
+### 9. ensure
 
 - **Target:** `anyhow.Ensure`
 - **Similarity:** 0.23
@@ -140,7 +129,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 3/3 matched
 - **Missing types:** _none_
 
-### 11. nightly
+### 10. nightly
 
 - **Target:** `anyhow.Nightly`
 - **Similarity:** 0.31
@@ -151,7 +140,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/1 matched (target 3)
 - **Missing types:** _none_
 
-### 12. macros
+### 11. macros
 
 - **Target:** `anyhow.Macros [ZERO]`
 - **Similarity:** 0.00
@@ -170,4 +159,17 @@ For each file to be considered "complete":
 - All tests ported
 - Documentation ported
 - port-lint header present
+
+## Reexport / Wiring Modules
+
+These files match `reexport_modules` patterns in `.ast_distance_config.json`. They are filtered out of
+normal priority and missing-file ladders because they are wiring
+modules, not direct logic ports. Consult them for call-site routing;
+do not treat them as the next implementation target by default.
+
+### Missing
+
+| Source | Expected target | Deps | Source path | Expected path |
+|--------|-----------------|------|-------------|---------------|
+| `lib` | `Lib` | 0 | `lib.rs` | `Lib.kt` |
 

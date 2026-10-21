@@ -1,14 +1,13 @@
 package io.github.kotlinmania.anyhow
 
-import kotlin.Result
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-internal fun bailLiteral(): Result<Unit> = bail("oh no!")
+internal fun bailLiteral(): Result<Unit, Error> = bail("oh no!")
 
-internal fun bailFmt(): Result<Unit> = bail("${"oh"} ${"no"}!")
+internal fun bailFmt(): Result<Unit, Error> = bail("${"oh"} ${"no"}!")
 
-internal fun bailError(): Result<Unit> = bail(TestIoError("oh no!"))
+internal fun bailError(): Result<Unit, Error> = bail(TestIoError("oh no!"))
 
 internal class TestIoError(
     private val message: String,
