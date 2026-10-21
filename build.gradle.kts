@@ -955,7 +955,7 @@ val jvmMainCompilation =
     (kotlin.targets.getByName("jvm") as org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget)
         .compilations.getByName("main")
 
-tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>("compileConsumerTestKotlinJvm").configure {
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileConsumerTestKotlinJvm").configure {
     friendPaths.setFrom(files())
 }
 
