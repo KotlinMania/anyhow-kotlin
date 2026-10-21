@@ -481,7 +481,7 @@ kotlin {
         compilations.create("consumerTest") {
             associateWith(mainComp)
             defaultSourceSet.dependencies {
-                implementation(kotlin("test"))
+                implementation("org.jetbrains.kotlin:kotlin-test-junit:2.4.20")
             }
         }
     }
@@ -948,12 +948,9 @@ tasks.register("setupAndroidSdk") {
     dependsOn("ensureAndroidSdk")
 }
 
-val jvmConsumerCompilation =
-    (kotlin.targets.getByName("jvm") as org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget)
-        .compilations.getByName("consumerTest")
-val jvmMainCompilation =
-    (kotlin.targets.getByName("jvm") as org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget)
-        .compilations.getByName("main")
+val jvmTarget = kotlin.targets.getByName("jvm") as org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
+val jvmConsumerCompilation = jvmTarget.compilations.getByName("consumerTest")
+val jvmMainCompilation = jvmTarget.compilations.getByName("main")
 
 tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileConsumerTestKotlinJvm").configure {
     friendPaths.setFrom(files())
@@ -966,8 +963,8 @@ val consumerTest =
         testClassesDirs = jvmConsumerCompilation.output.classesDirs
         classpath =
             jvmConsumerCompilation.output.allOutputs +
-                jvmConsumerCompilation.runtimeDependencyFiles +
-                jvmMainCompilation.output.allOutputs
+            jvmConsumerCompilation.runtimeDependencyFiles +
+            jvmMainCompilation.output.allOutputs
     }
 
 // Explicit test runner. Named hostTests to avoid shadowing the KMP allTests

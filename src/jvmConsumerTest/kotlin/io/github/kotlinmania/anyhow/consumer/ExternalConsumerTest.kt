@@ -39,6 +39,17 @@ class ExternalCustomError(
 }
 
 class ExternalConsumerTest {
+    private fun stripBacktrace(s: String): String {
+        val causedBy = s.indexOf("Caused by:")
+        if (causedBy < 0) {
+            val doubleNewline = s.indexOf("\n\n")
+            return if (doubleNewline >= 0) s.substring(0, doubleNewline) else s
+        }
+
+        val afterCausedBy = s.indexOf("\n\n", causedBy)
+        return if (afterCausedBy >= 0) s.substring(0, afterCausedBy) else s
+    }
+
     @Test
     fun testExternalErrorFormattingAndObjectIdentity() {
         val external = ExternalCustomError(404, "resource not found")
@@ -49,13 +60,13 @@ class ExternalConsumerTest {
         assertNotNull(downcasted)
         assertSame(external, downcasted)
 
-        // 2. Normal Display
+        // 2. Normal Display (outermost Display)
         assertEquals("Error 404: resource not found", err.displayString(alternate = false))
 
-        // 3. Normal Debug
-        assertEquals("ExternalCustomError(404, \"resource not found\")", err.debugString(alternate = false))
+        // 3. Normal Debug (Display + backtrace)
+        assertEquals("Error 404: resource not found", stripBacktrace(err.debugString(alternate = false)))
 
-        // 4. Alternate Debug
+        // 4. Alternate Debug (underlying Debug::fmt)
         val expectedAltDebug =
             "ExternalCustomError {\n" +
                 "    code: 404,\n" +
@@ -88,7 +99,7 @@ class ExternalConsumerTest {
         val contextDebug = withContext.debugString(alternate = false)
         assertTrue(contextDebug.contains("request processing failed"))
         assertTrue(contextDebug.contains("Caused by:"))
-        assertTrue(contextDebug.contains("ExternalCustomError(500, \"database connection failed\")"))
+        assertTrue(contextDebug.contains("Error 500: database connection failed"))
 
         // 5. Context Alternate Debug (recursively formatted struct with 4-space indent)
         val expectedContextAltDebug =
