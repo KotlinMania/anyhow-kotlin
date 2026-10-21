@@ -1,6 +1,6 @@
 # port-lint Proposed Changes
 
-**Generated:** 2026-10-14
+**Generated:** 2026-10-21
 **Source:** tmp/anyhow/src
 **Target:** src/commonMain/kotlin/io/github/kotlinmania/anyhow
 

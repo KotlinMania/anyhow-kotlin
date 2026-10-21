@@ -1,12 +1,7 @@
-@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
-
 // port-lint: source backtrace.rs
 
 package io.github.kotlinmania.anyhow
 
-import kotlin.native.HiddenFromObjC
-
-@HiddenFromObjC
 public class Backtrace internal constructor(
     internal val inner: Inner,
 ) {
@@ -73,7 +68,6 @@ internal fun Backtrace.fmt(
 
 internal fun Backtrace.Companion.enabled(): Boolean = true
 
-@HiddenFromObjC
 public fun Backtrace.Companion.capture(): Backtrace =
     if (enabled()) {
         create(0)
@@ -109,7 +103,6 @@ internal fun Backtrace.Companion.create(ip: Int): Backtrace {
     return Backtrace(inner)
 }
 
-@HiddenFromObjC
 public fun Backtrace.status(): BacktraceStatus =
     when (inner) {
         is Inner.Unsupported -> BacktraceStatus.Unsupported
@@ -141,7 +134,6 @@ internal fun Backtrace.fmt(fmt: Appendable): Appendable {
     return fmt
 }
 
-@HiddenFromObjC
 public enum class BacktraceStatus {
     Unsupported,
     Disabled,

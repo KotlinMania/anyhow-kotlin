@@ -1,19 +1,26 @@
 package io.github.kotlinmania.anyhow
 
-import kotlin.Result
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-internal fun bailLiteral(): Result<Unit> = bail("oh no!")
+internal fun bailLiteral(): Result<Unit, Error> = bail("oh no!")
 
-internal fun bailFmt(): Result<Unit> = bail("${"oh"} ${"no"}!")
+internal fun bailFmt(): Result<Unit, Error> = bail("${"oh"} ${"no"}!")
 
-internal fun bailError(): Result<Unit> = bail(TestIoError("oh no!"))
+internal fun bailError(): Result<Unit, Error> = bail(TestIoError("oh no!"))
 
 internal class TestIoError(
     private val message: String,
-) : StdError {
+) : StdError,
+    DebugFormatted {
     override fun toString(): String = message
+
+    override fun debugString(alternate: Boolean): String =
+        if (alternate) {
+            "Custom {\n    kind: PermissionDenied,\n    error: \"$message\",\n}"
+        } else {
+            message
+        }
 }
 
 class CommonTest {

@@ -25,18 +25,47 @@ internal fun display(
     return out.toString()
 }
 
+internal fun formatDebug(
+    error: StdError,
+    alternate: Boolean,
+): String {
+    if (error is ContextError<*, *>) {
+        val contextStr = error.context.toString().escapeDebug()
+        val sourceFormatted = formatDebug(error.error, alternate)
+        return if (alternate) {
+            val lines = sourceFormatted.split('\n')
+            val indentedSource = StringBuilder()
+            for ((idx, line) in lines.withIndex()) {
+                if (idx == 0) {
+                    indentedSource.append(line)
+                } else {
+                    indentedSource.append("\n    ").append(line)
+                }
+            }
+            "Error {\n    context: \"$contextStr\",\n    source: $indentedSource,\n}"
+        } else {
+            "Error { context: \"$contextStr\", source: $sourceFormatted }"
+        }
+    } else if (error is BoxedError) {
+        return formatDebug(error.value, alternate)
+    } else if (error is Error) {
+        return formatDebug(errorImplError(error.inner.byRef()), alternate)
+    } else {
+        return error.debugString(alternate)
+    }
+}
+
 internal fun debug(
     thisRef: Ref<ErrorImpl>,
     alternate: Boolean,
 ): String {
-    val out = StringBuilder()
     val error = errorImplError(thisRef)
 
     if (alternate) {
-        out.append(error.toString())
-        return out.toString()
+        return formatDebug(error, alternate = true)
     }
 
+    val out = StringBuilder()
     out.append(error.toString())
 
     val cause = error.source()

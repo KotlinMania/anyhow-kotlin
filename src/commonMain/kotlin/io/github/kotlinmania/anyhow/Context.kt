@@ -1,11 +1,6 @@
-@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
-
 // port-lint: source context.rs
 
 package io.github.kotlinmania.anyhow
-
-import kotlin.Result
-import kotlin.native.HiddenFromObjC
 
 internal object ext {
     internal interface StdError {
@@ -14,6 +9,9 @@ internal object ext {
 }
 
 internal fun StdError.extContext(context: Any): Error {
+    if (this is Error) {
+        return this.context(context)
+    }
     val backtrace = backtraceIfAbsent(this)
     return Error.constructFromContext(context, this, backtrace)
 }
@@ -21,35 +19,69 @@ internal fun StdError.extContext(context: Any): Error {
 internal fun Error.extContext(context: Any): Error = this.context(context)
 
 internal fun Throwable.extContext(context: Any): Error {
-    if (this is Error) {
-        return this.context(context)
+    if (this is AnyhowException) {
+        return this.error.context(context)
     }
 
     val backtrace = backtraceIfAbsent(this)
     return Error.constructFromContext(context, throwableAsStdError(this), backtrace)
 }
 
-@HiddenFromObjC
-public fun <T> Result<T>.context(context: Any): Result<T> {
-    val ok = getOrNull()
-    if (ok != null || isSuccess) {
-        return this
+public fun <T, E : StdError> Result<T, E>.context(context: Any): Result<T, Error> =
+    when (this) {
+        is Result.Ok -> Result.Ok(value)
+        is Result.Err -> Result.Err(error.extContext(context))
     }
 
-    val error = exceptionOrNull() ?: return this
-    return Result.failure(error.extContext(context))
-}
-
-@HiddenFromObjC
-public fun <T> Result<T>.withContext(context: () -> Any): Result<T> {
-    val ok = getOrNull()
-    if (ok != null || isSuccess) {
-        return this
+public fun <T, E : StdError> Result<T, E>.withContext(context: ContextSupplier): Result<T, Error> =
+    when (this) {
+        is Result.Ok -> Result.Ok(value)
+        is Result.Err -> Result.Err(error.extContext(context()))
     }
 
-    val error = exceptionOrNull() ?: return this
-    return Result.failure(error.extContext(context()))
+public inline fun <T, E : StdError> Result<T, E>.withContext(crossinline context: () -> Any): Result<T, Error> =
+    withContext(ContextSupplier { context() })
+
+@kotlin.jvm.JvmName("contextThrowable")
+public fun <T, E : Throwable> Result<T, E>.context(context: Any): Result<T, Error> =
+    when (this) {
+        is Result.Ok -> Result.Ok(value)
+        is Result.Err -> Result.Err(error.extContext(context))
+    }
+
+@kotlin.jvm.JvmName("withContextThrowable")
+public fun <T, E : Throwable> Result<T, E>.withContext(context: ContextSupplier): Result<T, Error> =
+    when (this) {
+        is Result.Ok -> Result.Ok(value)
+        is Result.Err -> Result.Err(error.extContext(context()))
+    }
+
+@kotlin.jvm.JvmName("withContextThrowableLambda")
+public inline fun <T, E : Throwable> Result<T, E>.withContext(crossinline context: () -> Any): Result<T, Error> =
+    withContext(ContextSupplier { context() })
+
+public fun <T> kotlin.Result<T>.context(context: Any): Result<T, Error> {
+    val ok = getOrNull()
+    if (ok != null || isSuccess) {
+        return Result.ok(getOrThrow())
+    }
+
+    val error = exceptionOrNull() ?: return Result.err(anyhow("unknown failure"))
+    return Result.err(error.extContext(context))
 }
+
+public fun <T> kotlin.Result<T>.withContext(context: ContextSupplier): Result<T, Error> {
+    val ok = getOrNull()
+    if (ok != null || isSuccess) {
+        return Result.ok(getOrThrow())
+    }
+
+    val error = exceptionOrNull() ?: return Result.err(anyhow("unknown failure"))
+    return Result.err(error.extContext(context()))
+}
+
+public inline fun <T> kotlin.Result<T>.withContext(crossinline context: () -> Any): Result<T, Error> =
+    withContext(ContextSupplier { context() })
 
 /**
  * Wrap a nullable value in a [Result], attaching context when `null`.
@@ -57,22 +89,23 @@ public fun <T> Result<T>.withContext(context: () -> Any): Result<T> {
  * ```kotlin
  * fun maybeGet(): Unit? = null
  *
- * fun demo(): Result<Unit> = maybeGet().toResult("there is no Unit")
+ * fun demo(): Result<Unit, Error> = maybeGet().toResult("there is no Unit")
  * ```
  */
-@HiddenFromObjC
-public fun <T> T?.toResult(context: Any): Result<T> =
+public fun <T> T?.toResult(context: Any): Result<T, Error> =
     when (this) {
-        null -> Result.failure(Error.constructFromDisplay(context, backtrace()))
+        null -> Result.err(Error.constructFromDisplay(context, backtrace()))
         else -> Ok(this)
     }
 
-@HiddenFromObjC
-public fun <T> T?.toResultWith(context: () -> Any): Result<T> =
+public fun <T> T?.toResultWith(context: ContextSupplier): Result<T, Error> =
     when (this) {
-        null -> Result.failure(Error.constructFromDisplay(context(), backtrace()))
+        null -> Result.err(Error.constructFromDisplay(context(), backtrace()))
         else -> Ok(this)
     }
+
+public inline fun <T> T?.toResultWith(crossinline context: () -> Any): Result<T, Error> =
+    toResultWith(ContextSupplier { context() })
 
 internal fun <C, E : StdError> ContextError<C, E>.fmt(
     f: Appendable,
@@ -139,7 +172,7 @@ private fun QuotedWriter.writeStr(s: String) {
     out.append(s.escapeDebug())
 }
 
-private fun String.escapeDebug(): String {
+internal fun String.escapeDebug(): String {
     val out = StringBuilder()
     for (ch in this) {
         out.append(ch.escapeDebug())
@@ -147,7 +180,7 @@ private fun String.escapeDebug(): String {
     return out.toString()
 }
 
-private fun Char.escapeDebug(): String =
+internal fun Char.escapeDebug(): String =
     when (this) {
         '\t' -> "\\t"
         '\r' -> "\\r"
@@ -161,28 +194,37 @@ private fun Char.escapeDebug(): String =
 
 internal interface Sealed
 
-internal class SealedResult<T>(
-    private val value: Result<T>,
-) : Context<T, Error>,
+internal class SealedResult<T, E : StdError>(
+    private val value: Result<T, E>,
+) : Context<T, E>,
     Sealed {
-    override fun context(context: Any): Result<T> = value.context(context)
+    override fun context(context: Any): Result<T, Error> = value.context(context)
 
-    override fun withContext(f: () -> Any): Result<T> = value.withContext(f)
+    override fun withContext(context: ContextSupplier): Result<T, Error> = value.withContext(context)
+}
+
+internal class SealedResultThrowable<T, E : Throwable>(
+    private val value: Result<T, E>,
+) : Context<T, E>,
+    Sealed {
+    override fun context(context: Any): Result<T, Error> = value.context(context)
+
+    override fun withContext(context: ContextSupplier): Result<T, Error> = value.withContext(context)
 }
 
 internal class SealedOption<T>(
     private val value: T?,
 ) : Context<T, Nothing>,
     Sealed {
-    override fun context(context: Any): Result<T> =
+    override fun context(context: Any): Result<T, Error> =
         when (val v = value) {
-            null -> Result.failure(Error.constructFromDisplay(context, backtrace()))
+            null -> Result.err(Error.constructFromDisplay(context, backtrace()))
             else -> Ok(v)
         }
 
-    override fun withContext(f: () -> Any): Result<T> =
+    override fun withContext(context: ContextSupplier): Result<T, Error> =
         when (val v = value) {
-            null -> Result.failure(Error.constructFromDisplay(f(), backtrace()))
+            null -> Result.err(Error.constructFromDisplay(context(), backtrace()))
             else -> Ok(v)
         }
 }

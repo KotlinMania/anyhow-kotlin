@@ -1,16 +1,44 @@
 // port-lint: source tests/test_fmt.rs
 package io.github.kotlinmania.anyhow
 
-import kotlin.Result
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class FmtDisplayTest {
-    private fun f(): Result<Unit> = bail(TestIoError("oh no!"))
+    companion object {
+        private const val EXPECTED_ALTDEBUG_F: String =
+            "Custom {\n" +
+                "    kind: PermissionDenied,\n" +
+                "    error: \"oh no!\",\n" +
+                "}"
 
-    private fun g(): Result<Unit> = f().context("f failed")
+        private const val EXPECTED_ALTDEBUG_G: String =
+            "Error {\n" +
+                "    context: \"f failed\",\n" +
+                "    source: Custom {\n" +
+                "        kind: PermissionDenied,\n" +
+                "        error: \"oh no!\",\n" +
+                "    },\n" +
+                "}"
 
-    private fun h(): Result<Unit> = g().context("g failed")
+        private const val EXPECTED_ALTDEBUG_H: String =
+            "Error {\n" +
+                "    context: \"g failed\",\n" +
+                "    source: Error {\n" +
+                "        context: \"f failed\",\n" +
+                "        source: Custom {\n" +
+                "            kind: PermissionDenied,\n" +
+                "            error: \"oh no!\",\n" +
+                "        },\n" +
+                "    },\n" +
+                "}"
+    }
+
+    private fun f(): Result<Unit, Error> = bail(TestIoError("oh no!"))
+
+    private fun g(): Result<Unit, Error> = f().context("f failed")
+
+    private fun h(): Result<Unit, Error> = g().context("g failed")
 
     @Test
     fun testDisplay() {
@@ -34,10 +62,6 @@ class FmtDisplayTest {
         val errG = g().exceptionOrNull() as Error
         val errH = h().exceptionOrNull() as Error
 
-        // Backtrace is always captured in Kotlin, unlike Rust where it is
-        // disabled by default in tests. Strip the backtrace portion (which
-        // starts at the second "\n\n" separator) to compare only the error
-        // and causes section.
         val debugF = errF.debugString(alternate = false)
         assertEquals("oh no!", stripBacktrace(debugF))
 
@@ -50,36 +74,25 @@ class FmtDisplayTest {
         assertEquals(expectedH, stripBacktrace(debugH))
     }
 
-    // In Rust the debug format does not include a backtrace by default.
-    // In Kotlin a backtrace is always captured, so the debug output is
-    // "<error and causes>\n\n<backtrace>". This strips the backtrace tail.
-    // The backtrace section is the last "\n\n"-separated block that is NOT
-    // part of the "Caused by:" cause chain. The cause chain lines are indented
-    // (start with spaces) or are the "Caused by:" header; the backtrace starts
-    // with a non-indented line.
+    @Test
+    fun testAltDebug() {
+        val errF = f().exceptionOrNull() as Error
+        val errG = g().exceptionOrNull() as Error
+        val errH = h().exceptionOrNull() as Error
+
+        assertEquals(EXPECTED_ALTDEBUG_F, errF.debugString(alternate = true))
+        assertEquals(EXPECTED_ALTDEBUG_G, errG.debugString(alternate = true))
+        assertEquals(EXPECTED_ALTDEBUG_H, errH.debugString(alternate = true))
+    }
+
     private fun stripBacktrace(s: String): String {
-        val causedByIndex = s.indexOf("Caused by:")
-        if (causedByIndex == -1) {
-            // No cause chain — the backtrace (if any) follows the error message.
-            val separator = s.indexOf("\n\n")
-            return if (separator >= 0) s.substring(0, separator) else s
+        val causedBy = s.indexOf("Caused by:")
+        if (causedBy < 0) {
+            val doubleNewline = s.indexOf("\n\n")
+            return if (doubleNewline >= 0) s.substring(0, doubleNewline) else s
         }
-        // After "Caused by:", find the backtrace section: it starts with "\n\n"
-        // followed by a non-indented line (not starting with a space or digit).
-        val afterCausedBy = causedByIndex + "Caused by:".length
-        val rest = s.substring(afterCausedBy)
-        var searchFrom = 0
-        while (true) {
-            val nextSeparator = rest.indexOf("\n\n", searchFrom)
-            if (nextSeparator == -1) return s
-            val afterSeparator = nextSeparator + 2
-            val lineStart = rest.substring(afterSeparator)
-            // Cause lines start with spaces (indented) or are empty;
-            // backtrace lines start with a non-whitespace character.
-            if (lineStart.isNotEmpty() && !lineStart.startsWith(" ") && !lineStart.startsWith("\t")) {
-                return s.substring(0, afterCausedBy + nextSeparator)
-            }
-            searchFrom = nextSeparator + 1
-        }
+
+        val afterCausedBy = s.indexOf("\n\n", causedBy)
+        return if (afterCausedBy >= 0) s.substring(0, afterCausedBy) else s
     }
 }

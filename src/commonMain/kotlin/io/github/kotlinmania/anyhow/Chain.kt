@@ -1,12 +1,16 @@
-@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
-
 // port-lint: source chain.rs
 
 package io.github.kotlinmania.anyhow
 
-import kotlin.native.HiddenFromObjC
-
 internal typealias Item = StdError
+
+/**
+ * Bounds on the remaining length of an iterator.
+ */
+public data class SizeHint(
+    public val lower: Int,
+    public val upper: Int?,
+)
 
 /**
  * Iterator of a chain of source errors.
@@ -26,7 +30,6 @@ internal typealias Item = StdError
  * }
  * ```
  */
-@HiddenFromObjC
 public class Chain internal constructor(
     internal var state: ChainState,
 ) : Iterator<StdError> {
@@ -54,19 +57,16 @@ internal fun next(chain: Chain): Item =
         }
     }
 
-@HiddenFromObjC
 public fun Chain.Companion.new(head: StdError): Chain =
     Chain(
         state = ChainState.Linked(next = head),
     )
 
-@HiddenFromObjC
-public fun Chain.sizeHint(): Pair<Int, Int?> {
+public fun Chain.sizeHint(): SizeHint {
     val len = len()
-    return Pair(len, len)
+    return SizeHint(len, len)
 }
 
-@HiddenFromObjC
 public fun Chain.nextBack(): Item? =
     when (val s = state) {
         is ChainState.Linked -> {
@@ -87,7 +87,6 @@ public fun Chain.nextBack(): Item? =
         }
     }
 
-@HiddenFromObjC
 public fun Chain.len(): Int =
     when (val s = state) {
         is ChainState.Linked -> {
@@ -106,7 +105,6 @@ public fun Chain.len(): Int =
         }
     }
 
-@HiddenFromObjC
 public fun Chain.clone(): Chain =
     when (val s = state) {
         is ChainState.Linked -> {
@@ -122,7 +120,6 @@ public fun Chain.clone(): Chain =
         }
     }
 
-@HiddenFromObjC
 public fun Chain.Companion.default(): Chain =
     Chain(
         state = ChainState.Buffered(rest = ArrayDeque()),

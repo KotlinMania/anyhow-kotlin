@@ -1,11 +1,6 @@
-@file:OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
-
 // port-lint: source macros.rs
 
 package io.github.kotlinmania.anyhow
-
-import kotlin.Result
-import kotlin.native.HiddenFromObjC
 
 /**
  * Construct an ad-hoc error from a string or existing non-`anyhow` error value.
@@ -19,31 +14,30 @@ import kotlin.native.HiddenFromObjC
  * # Example
  *
  * ```kotlin
- * fun lookup(key: String): Result<Unit> {
+ * fun lookup(key: String): Result<Unit, Error> {
  *     if (key.length != 16) {
- *         return Result.failure(anyhow("key length must be 16 characters, got $key"))
+ *         return Result.err(anyhow("key length must be 16 characters, got $key"))
  *     }
  *     return Ok(Unit)
  * }
  * ```
  */
-@HiddenFromObjC
 public fun anyhow(message: String): Error = Error.msg(message)
 
-@HiddenFromObjC
 public fun anyhow(error: Any): Error =
     when (error) {
         is ErrorConvertible -> Trait.new(error)
         is StdError -> Boxed.new(error)
+        is Throwable -> Boxed.new(throwableAsStdError(error))
         else -> Adhoc.new(error)
     }
 
 /**
  * Return early with an error.
  *
- * This helper is equivalent to `Result.failure(anyhow(args))`.
+ * This helper is equivalent to `Result.err(anyhow(args))`.
  *
- * The surrounding function's or closure's return value is required to be `Result<T>`.
+ * The surrounding function's or closure's return value is required to be [Result].
  *
  * # Example
  *
@@ -53,16 +47,14 @@ public fun anyhow(error: Any): Error =
  * }
  * ```
  */
-@HiddenFromObjC
-public fun bail(message: String): Result<Nothing> = Result.failure(anyhow(message))
+public fun bail(message: String): Result<Nothing, Error> = Result.err(anyhow(message))
 
-@HiddenFromObjC
-public fun bail(error: Any): Result<Nothing> = Result.failure(anyhow(error))
+public fun bail(error: Any): Result<Nothing, Error> = Result.err(anyhow(error))
 
 /**
  * Return early with an error if a condition is not satisfied.
  *
- * This helper is equivalent to `if (!cond) return Result.failure(anyhow(args)) else Ok(Unit)`.
+ * This helper is equivalent to `if (!cond) return Result.err(anyhow(args)) else Ok(Unit)`.
  *
  * Analogously to `check`, [ensure] takes a condition and produces a failure if the condition
  * fails. Unlike `check`, [ensure] returns a [Result] containing an [Error] rather than throwing.
@@ -73,14 +65,12 @@ public fun bail(error: Any): Result<Nothing> = Result.failure(anyhow(error))
  * ensure(user == 0, "only user 0 is allowed").getOrThrow()
  * ```
  */
-@HiddenFromObjC
 public fun ensure(
     cond: Boolean,
     message: String,
-): Result<Unit> = if (cond) Ok(Unit) else Result.failure(anyhow(message))
+): Result<Unit, Error> = if (cond) Ok(Unit) else Result.err(anyhow(message))
 
-@HiddenFromObjC
 public fun ensure(
     cond: Boolean,
     error: Any,
-): Result<Unit> = if (cond) Ok(Unit) else Result.failure(anyhow(error))
+): Result<Unit, Error> = if (cond) Ok(Unit) else Result.err(anyhow(error))

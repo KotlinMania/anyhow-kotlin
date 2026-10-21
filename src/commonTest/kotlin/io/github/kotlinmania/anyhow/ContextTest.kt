@@ -37,7 +37,6 @@ class ContextTest {
 
     private fun makeChain(): Error {
         val low = LowLevel("no such file or directory")
-        // Context for a non-Error StdError goes through the anyhow trait path.
         val midError = Error.new(low).context(MidLevel("failed to load config"))
         val high = midError.context(HighLevel("failed to start server"))
         return high

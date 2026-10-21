@@ -1,4 +1,3 @@
-// port-lint: source tests/drop/mod.rs
 package io.github.kotlinmania.anyhow
 
 import kotlin.concurrent.atomics.AtomicBoolean
