@@ -7,7 +7,9 @@
     "Sources/ReverseCallAdapter/ReverseCall.swift": "f2dabd0abb2fa13886ab64960857af7b7a647bfeb0746833f64be2f17e23dd95",
     "Tests/ReverseCallAdapterTests/ReverseCallTests.swift": "5fdfa015f96ac4930e78b82d46743c2d8f8bc1cd93375cc5c774ff5a9bec43dc",
     "Package.swift": "342592f7fe2d7f1296a24e80ab4f676a88b00f796576d9ca6dd771f5895b4c6e",
-    "README.md": "7b9a196a85867301df154ecee4fd2cd4fef88ec1499b67527a82c08a1f761e04"
+    "README.md": "9ca2bb89226e206f3e6482551d38fed1a8e0824d132384b04b7c3224ca36667f",
+    "UPSTREAM_PATCH_PLAN.md": "cd71a563d3a6e5767353f88417029b1862125095c5322e8ded395789823d2f6a",
+    "RUNTIME_RESULT.json": "1649938a843354a5779e49f998a3e0e6da7c3b15a9ef9da02a10935fc840d00b"
   },
   "object_compile": {
     "session": 95637,
@@ -17,7 +19,14 @@
     "diagnostics": 0,
     "runtime_tests": 0
   },
-  "runtime_validation": "Six cases queued; unexecuted at preservation time",
+  "runtime_validation": {
+    "session": 83710,
+    "process_exit": 0,
+    "six_named_cases_passed_once": true,
+    "skips": 0,
+    "actual_product_frontends_swift6_werror_macos15": true,
+    "scope": "ConcreteMainActorrequest only; no originalopaquecontract/full22 acceptance"
+  },
   "public_callback_contract_preserved": false,
   "upstream_publication": "Not authorized or completed",
   "first_runtime_attempt": {

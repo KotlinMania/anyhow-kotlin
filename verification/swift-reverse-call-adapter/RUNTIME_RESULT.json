@@ -1,0 +1,39 @@
+{
+  "session": 83710,
+  "process_exit": 0,
+  "six_test_scope_accepted": true,
+  "named_pass_counts": {
+    "actorOwnedReverseCallPreservesCachedPayloadIdentity": 1,
+    "cancellationBeforeDispatchDoesNotInvokeOperation": 1,
+    "failedReadyNotificationDiscardsTypedResult": 1,
+    "cancellationDuringSuspensionWaitsForActualOperationCompletion": 1,
+    "cancellationAfterReadinessDiscardsTheUntakenResult": 1,
+    "finishedTaskDoesNotRetainItsRequestFrame": 1
+  },
+  "skipped_tests": 0,
+  "swift_version": "6.3.3",
+  "swift_language_mode": 6,
+  "warnings_as_errors": true,
+  "deployment_target": "arm64-apple-macosx15.0",
+  "jobs": 2,
+  "current_product_frontend_commands": 4,
+  "current_product_frontends_all_strict": true,
+  "prior_unchanged_product_compile_evidence": {
+    "session": 43746,
+    "actual_product_frontends": 12,
+    "swift_language_mode": 6,
+    "warnings_as_errors": true,
+    "deployment_target": "arm64-apple-macosx15.0",
+    "note": "Stopped on test weak-binding warning before runtime; dependency source/tool hashes unchanged in passing run"
+  },
+  "all29_frozen_inputs_unchanged": true,
+  "log_sha256": "34d9145405bf2087aff08ba8a340e9499295f8145d3bbbdd90de82feb91c1160",
+  "request_sha256": "5f4709298dea2828c9bbdf7e435f31c20bc52948706e816be625f382227a3daa",
+  "native_archive_sha256": "7cad746a316103f538c0ffdf672032109f0a9667897bfa9ee77abb241076d78e",
+  "core_sha256": "f2dabd0abb2fa13886ab64960857af7b7a647bfeb0746833f64be2f17e23dd95",
+  "tests_sha256": "5fdfa015f96ac4930e78b82d46743c2d8f8bc1cd93375cc5c774ff5a9bec43dc",
+  "existing_opaque_callback_compatibility": false,
+  "original22_or_protocol4_acceptance": false,
+  "anyhow_ci_fixed": false,
+  "published_repair_selected": false
+}

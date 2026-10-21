@@ -18,7 +18,7 @@ The header baseline is pinned to the official exporter resource SHA256 `62a8e726
 
 The partial forward repair changes import handling, owned error text, coroutine cancellation/result handling, generated callback carriers and caller isolation. The isolated forward build passed; two named Swift tests and four Native cleanup checks passed with all actual product/test frontend commands using Swift6 and warnings-as-errors. Its experimental JAR hash `49851dd9c565dec2c0aab8806690946706713f42f5115e491214b78f19ed313e` is provenance only and is not an official coordinate or an authorized consumer selection.
 
-The reverse-call source in this directory is separate. It passed strict object compilation against real retained Payload/KotlinBase declarations, but requires full caller-side code generation in the actual owning lexical isolation. It does not preserve arbitrary opaque actor-bound callback registration. Six lifecycle cases are not a replacement for the original22 producer cases or the four protocol/override cases; those acceptance gaps remain open.
+The reverse-call source in this directory is separate. It passed strict object compilation against real retained Payload/KotlinBase declarations, but requires full caller-side code generation in the actual owning lexical isolation. It does not preserve arbitrary opaque actor-bound callback registration. Its six real-object lifecycle tests now pass under actual Swift6/Werror/macOS15 (83710), but those cases are not a replacement for the original22 producer cases or the four protocol/override cases; those acceptance gaps remain open.
 
 ## Required completion sequence
 
