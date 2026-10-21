@@ -146,7 +146,7 @@ func finishedTaskDoesNotRetainItsRequestFrame() async throws {
     let original = Payload(label: "frame lifetime")
     var owner: MainActorReverseRequest<Payload, Payload>? =
         MainActorReverseRequest(argument: original, operation: { $0 }, notify: { _ in })
-    weak var observed = owner
+    weak let observed = owner
     let ticket = try #require(owner).start()
     await ticket.waitForOperation()
     let returned = try #require(owner).take()

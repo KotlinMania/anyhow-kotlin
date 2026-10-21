@@ -5,9 +5,9 @@
   "core_source_sha256": "f2dabd0abb2fa13886ab64960857af7b7a647bfeb0746833f64be2f17e23dd95",
   "files": {
     "Sources/ReverseCallAdapter/ReverseCall.swift": "f2dabd0abb2fa13886ab64960857af7b7a647bfeb0746833f64be2f17e23dd95",
-    "Tests/ReverseCallAdapterTests/ReverseCallTests.swift": "8be3041416e8a0e435e0a85c7b5a18a8c3d4fba7cb2d2ace4da59e232e1d6ab2",
+    "Tests/ReverseCallAdapterTests/ReverseCallTests.swift": "5fdfa015f96ac4930e78b82d46743c2d8f8bc1cd93375cc5c774ff5a9bec43dc",
     "Package.swift": "342592f7fe2d7f1296a24e80ab4f676a88b00f796576d9ca6dd771f5895b4c6e",
-    "README.md": "22a6d21adfe79e95ee0f92d32f8a90101ee178995320ae7dccac4e8c3de6ee20"
+    "README.md": "7b9a196a85867301df154ecee4fd2cd4fef88ec1499b67527a82c08a1f761e04"
   },
   "object_compile": {
     "session": 95637,
@@ -26,5 +26,13 @@
     "tests_executed": 0,
     "cause": "Missing globalmacOS15target, dependencycompiledmacOS10.13",
     "source_unchanged": true
+  },
+  "second_runtime_attempt": {
+    "session": 43746,
+    "exit": 1,
+    "tests_executed": 0,
+    "actual_product_frontends": 12,
+    "all_actual_product_frontends_swift6_werror_macos15": true,
+    "cause": "weak var observed nevermutated; handwritten test corrected toweaklet, no assertion removed"
   }
 }

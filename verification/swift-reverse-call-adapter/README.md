@@ -6,13 +6,13 @@ The request keeps its typed argument, operation and result on MainActor. A check
 
 ## Current evidence and limits
 
-Source `ReverseCall.swift` and a separate client importing actual Integration.Payload and KotlinRuntime.KotlinBase passed real Swift 6 object compilation with warnings-as-errors, zero diagnostics (session95637). That did not execute a test or link a complete library. The six lifecycle tests were unexecuted when this source preservation commit was prepared. They retain the real Payload alias and cover identity, cancellation before dispatch, failed readiness notification, cancellation during suspension, cancellation after readiness/repeated discard, and eventual frame release.
+Source `ReverseCall.swift` and a separate client importing actual Integration.Payload and KotlinRuntime.KotlinBase passed real Swift 6 object compilation with warnings-as-errors, zero diagnostics (session95637). That did not execute a test or link a complete library. The six lifecycle tests remain unexecuted: the first attempts stopped before runtime on a deployment-target configuration error and then a Swift6.3 weak-binding warning in the test. Those failures are preserved; the corrections change the target configuration and the immutable weak binding, without removing assertions. They retain the real Payload alias and cover identity, cancellation before dispatch, failed readiness notification, cancellation during suspension, cancellation after readiness/repeated discard, and eventual frame release.
 
 The existing exporter accepts an already opaque @Sendable @isolated(any) (Payload) async throws -> Payload. This code does not prove a compatible conversion of that interface. It requires the complete request/conversion code to be generated inside the actual owning lexical actor scope. MainActor is the concrete implementation here; other actors and arbitrary opaque callback registration remain unresolved. Do not silently replace the original API, restrict models to Sendable, replace the original22 tests, or interpret this source experiment as an official toolchain repair.
 
 ## Reproduce the isolated tests
 
-Use the same coherent Integration Swift package, generated headers, runtime resources and libIntegration.a built from a reviewed exporter revision. They must expose the real KotlinBase-derived Payload(label:) and its label property. Record their hashes and the exact producer revision. No generated source or binary dependency is vendored here; no machine-specific path is selected by default.
+Use the recorded Swift6.3.3/Xcode26.6 toolchain and the same coherent Integration Swift package, generated headers, runtime resources and libIntegration.a built from a reviewed exporter revision. They must expose the real KotlinBase-derived Payload(label:) and its label property. Record their hashes and the exact producer revision. No generated source or binary dependency is vendored here; no machine-specific path is selected by default.
 
 Set SWIFT_REVERSE_INTEGRATION_PACKAGE to the verified generated Package.swift directory and SWIFT_REVERSE_NATIVE_PRODUCTS to the matching libIntegration.a directory. Then run from this directory:
 
