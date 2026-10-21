@@ -33,6 +33,8 @@ internal class BoxedError(
     override fun source(): StdError? = source(this)
 
     override fun toString(): String = fmt(StringBuilder()).toString()
+
+    override fun debugString(alternate: Boolean): String = value.debugString(alternate)
 }
 
 internal fun BoxedError.fmt(f: Appendable): Appendable = f.append(value.toString())

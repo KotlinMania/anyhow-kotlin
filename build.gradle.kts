@@ -477,6 +477,13 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(jvmToolchainVersion.toString()))
         }
+        val mainComp = compilations.getByName("main")
+        compilations.create("consumerTest") {
+            associateWith(mainComp)
+            defaultSourceSet.dependencies {
+                implementation(kotlin("test"))
+            }
+        }
     }
 
     sourceSets {
@@ -941,6 +948,28 @@ tasks.register("setupAndroidSdk") {
     dependsOn("ensureAndroidSdk")
 }
 
+val jvmConsumerCompilation =
+    (kotlin.targets.getByName("jvm") as org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget)
+        .compilations.getByName("consumerTest")
+val jvmMainCompilation =
+    (kotlin.targets.getByName("jvm") as org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget)
+        .compilations.getByName("main")
+
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>("compileConsumerTestKotlinJvm").configure {
+    friendPaths.setFrom(files())
+}
+
+val consumerTest =
+    tasks.register<Test>("consumerTest") {
+        group = "verification"
+        description = "Runs the external consumer test suite compiled outside friend paths."
+        testClassesDirs = jvmConsumerCompilation.output.classesDirs
+        classpath =
+            jvmConsumerCompilation.output.allOutputs +
+                jvmConsumerCompilation.runtimeDependencyFiles +
+                jvmMainCompilation.output.allOutputs
+    }
+
 // Explicit test runner. Named hostTests to avoid shadowing the KMP allTests
 // lifecycle task. Do not use findByName/mapNotNull here: missing test tasks
 // mean the target surface drifted and must fail loudly.
@@ -949,6 +978,7 @@ tasks.register("hostTests") {
     description = "Runs the required real test suite (jvm, macosArm64, js, wasmJs, wasmWasi, android host)."
     dependsOn(
         "jvmTest",
+        consumerTest,
         "macosArm64Test",
         "kotlinUpgradeYarnLock",
         "jsNodeTest",

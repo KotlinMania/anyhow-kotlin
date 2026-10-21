@@ -25,11 +25,20 @@ package io.github.kotlinmania.anyhow
  */
 
 /**
- * A minimal "standard error" abstraction used throughout the anyhow library.
- * Provides a [source] chain for causal errors.
+ * A type that provides debug formatting corresponding to Rust's `core::fmt::Debug`.
  */
-public interface StdError {
+public interface DebugFormatted {
+    public fun debugString(alternate: Boolean = false): String
+}
+
+/**
+ * A minimal "standard error" abstraction used throughout the anyhow library.
+ * Provides a [source] chain for causal errors and debug formatting.
+ */
+public interface StdError : DebugFormatted {
     public fun source(): StdError? = null
+
+    override fun debugString(alternate: Boolean): String = toString()
 }
 
 /**
@@ -50,6 +59,8 @@ public class Error internal constructor(
     override fun source(): StdError? = errorSource(this)
 
     override fun toString(): String = display(inner.byRef(), alternate = false)
+
+    override fun debugString(alternate: Boolean): String = debug(inner.byRef(), alternate = alternate)
 
     public companion object
 }
