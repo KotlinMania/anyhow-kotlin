@@ -25,6 +25,10 @@ internal fun display(
     return out.toString()
 }
 
+internal interface DebugFormatted {
+    fun debugString(alternate: Boolean): String
+}
+
 internal fun formatDebug(
     error: StdError,
     alternate: Boolean,
@@ -46,10 +50,14 @@ internal fun formatDebug(
         } else {
             "Error { context: \"$contextStr\", source: $sourceFormatted }"
         }
+    } else if (error is BoxedError) {
+        return formatDebug(error.value, alternate)
     } else if (error is Error) {
         return formatDebug(errorImplError(error.inner.byRef()), alternate)
-    } else {
+    } else if (error is DebugFormatted) {
         return error.debugString(alternate)
+    } else {
+        return error.toString()
     }
 }
 

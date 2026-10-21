@@ -11,7 +11,8 @@ internal fun bailError(): Result<Unit, Error> = bail(TestIoError("oh no!"))
 
 internal class TestIoError(
     private val message: String,
-) : StdError {
+) : StdError,
+    DebugFormatted {
     override fun toString(): String = message
 
     override fun debugString(alternate: Boolean): String =

@@ -26,6 +26,11 @@ class RegressionTest {
 
     // 2. Custom E in generic Result contract: Result<T, E> can hold an arbitrary
     // non-Throwable, non-StdError error type E.
+    private data class CustomDiagnostic(
+        val code: Int,
+        val message: String,
+    )
+
     @Test
     fun testCustomErrorTypeInResult() {
         val diag = CustomDiagnostic(404, "resource missing")

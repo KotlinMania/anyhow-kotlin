@@ -81,8 +81,6 @@ internal class ContextError<C, E>(
     override fun source(): StdError? = error
 
     override fun toString(): String = context.toString()
-
-    override fun debugString(alternate: Boolean): String = formatDebug(this, alternate)
 }
 
 private fun vtable(p: ErrorImpl): ErrorVTable = p.vtable
@@ -202,6 +200,8 @@ public fun Error.rootCause(): StdError {
 public fun Error.backtrace(): Backtrace = ErrorImpl.backtrace(inner.byRef())
 
 public fun Error.displayString(alternate: Boolean = false): String = display(inner.byRef(), alternate = alternate)
+
+public fun Error.debugString(alternate: Boolean = false): String = debug(inner.byRef(), alternate = alternate)
 
 /**
  * Convert to a standard error object.
