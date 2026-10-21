@@ -28,6 +28,7 @@ public fun anyhow(error: Any): Error =
     when (error) {
         is ErrorConvertible -> Trait.new(error)
         is StdError -> Boxed.new(error)
+        is Throwable -> Boxed.new(throwableAsStdError(error))
         else -> Adhoc.new(error)
     }
 

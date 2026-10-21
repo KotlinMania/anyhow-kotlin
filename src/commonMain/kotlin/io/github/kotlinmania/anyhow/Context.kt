@@ -172,7 +172,7 @@ private fun QuotedWriter.writeStr(s: String) {
     out.append(s.escapeDebug())
 }
 
-private fun String.escapeDebug(): String {
+internal fun String.escapeDebug(): String {
     val out = StringBuilder()
     for (ch in this) {
         out.append(ch.escapeDebug())
@@ -180,7 +180,7 @@ private fun String.escapeDebug(): String {
     return out.toString()
 }
 
-private fun Char.escapeDebug(): String =
+internal fun Char.escapeDebug(): String =
     when (this) {
         '\t' -> "\\t"
         '\r' -> "\\r"

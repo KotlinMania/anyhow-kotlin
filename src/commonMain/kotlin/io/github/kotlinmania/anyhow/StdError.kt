@@ -81,6 +81,8 @@ internal class ContextError<C, E>(
     override fun source(): StdError? = error
 
     override fun toString(): String = context.toString()
+
+    override fun debugString(alternate: Boolean): String = formatDebug(this, alternate)
 }
 
 private fun vtable(p: ErrorImpl): ErrorVTable = p.vtable
@@ -200,8 +202,6 @@ public fun Error.rootCause(): StdError {
 public fun Error.backtrace(): Backtrace = ErrorImpl.backtrace(inner.byRef())
 
 public fun Error.displayString(alternate: Boolean = false): String = display(inner.byRef(), alternate = alternate)
-
-public fun Error.debugString(alternate: Boolean = false): String = debug(inner.byRef(), alternate = alternate)
 
 /**
  * Convert to a standard error object.
@@ -416,13 +416,17 @@ private fun objectBoxed(e: Own<ErrorImpl>): StdError = e.ptr.`object`
 
 private fun objectReallocateBoxed(e: Own<ErrorImpl>): StdError = e.ptr.`object`
 
+private fun unwrapTarget(value: Any?, target: KClass<*>): Any? {
+    if (value == null) return null
+    if (target.isInstance(value)) return value
+    if (value is ThrowableStdError && target.isInstance(value.value)) return value.value
+    return null
+}
+
 private fun objectDowncast(
     e: Ref<ErrorImpl>,
     target: KClass<*>,
-): Any? {
-    val value = e.ptr.`object`
-    return if (target.isInstance(value)) value else null
-}
+): Any? = unwrapTarget(e.ptr.`object`, target)
 
 private fun noBacktrace(e: Ref<ErrorImpl>): Backtrace? {
     val ignored = e
@@ -434,8 +438,7 @@ private fun objectDowncastMessage(
     target: KClass<*>,
 ): Any? {
     val obj = e.ptr.`object` as MessageError<*>
-    val value = obj.value
-    return if (target.isInstance(value)) value else null
+    return unwrapTarget(obj.value, target)
 }
 
 private fun objectDowncastDisplay(
@@ -443,8 +446,7 @@ private fun objectDowncastDisplay(
     target: KClass<*>,
 ): Any? {
     val obj = e.ptr.`object` as DisplayError<*>
-    val value = obj.value
-    return if (target.isInstance(value)) value else null
+    return unwrapTarget(obj.value, target)
 }
 
 private fun contextDowncast(
@@ -453,10 +455,14 @@ private fun contextDowncast(
 ): Any? {
     val ctx = e.ptr.`object` as ContextError<*, *>
     val context = ctx.context
-    if (target.isInstance(context)) return context
+    val contextResult = unwrapTarget(context, target)
+    if (contextResult != null) return contextResult
 
     val error = ctx.error
-    return if (target.isInstance(error)) error else null
+    val errorResult = unwrapTarget(error, target)
+    if (errorResult != null) return errorResult
+    if (error is Error) return error.downcastRef(target)
+    return null
 }
 
 private fun contextDropRest(
@@ -472,8 +478,7 @@ private fun objectDowncastBoxed(
     target: KClass<*>,
 ): Any? {
     val boxed = e.ptr.`object` as BoxedError
-    val value = boxed.value
-    return if (target.isInstance(value)) value else null
+    return unwrapTarget(boxed.value, target)
 }
 
 private fun contextChainObjectRef(e: Ref<ErrorImpl>): StdError = e.ptr.`object`

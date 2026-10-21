@@ -35,15 +35,16 @@ import Anyhow
     }
 
     @Test func testCustomErrorObjectIdentity() {
-        let err: Anyhow.Error = Anyhow.anyhow(message: "custom error object")
-        let result: Anyhow.Result = Anyhow.Result.Companion.shared.err(error: err)
+        let custom: CustomDiagnostic = CustomDiagnostic(code: 404, message: "custom diagnostic error")
+        let result: Anyhow.Result = Anyhow.Result.Companion.shared.err(error: custom)
         #expect(result.isFailure)
         #expect(!result.isSuccess)
         #expect(result is Anyhow.Result.Err)
-        let extracted = result.exceptionOrNull() as? Anyhow.Error
+        let extracted = result.exceptionOrNull() as? CustomDiagnostic
         #expect(extracted != nil)
-        #expect(extracted === err)
-        #expect(extracted?.toString() == "custom error object")
+        #expect(extracted === custom)
+        #expect(extracted?.code == 404)
+        #expect(extracted?.message == "custom diagnostic error")
     }
 
     @Test func testAnyhowResultFailureAndBail() {

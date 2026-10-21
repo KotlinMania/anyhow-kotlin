@@ -13,6 +13,13 @@ internal class TestIoError(
     private val message: String,
 ) : StdError {
     override fun toString(): String = message
+
+    override fun debugString(alternate: Boolean): String =
+        if (alternate) {
+            "Custom {\n    kind: PermissionDenied,\n    error: \"$message\",\n}"
+        } else {
+            message
+        }
 }
 
 class CommonTest {

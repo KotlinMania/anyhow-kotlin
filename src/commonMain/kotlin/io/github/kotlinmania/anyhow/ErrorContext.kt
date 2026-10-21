@@ -30,6 +30,19 @@ package io.github.kotlinmania.anyhow
  */
 public interface StdError {
     public fun source(): StdError? = null
+
+    public fun debugString(alternate: Boolean = false): String = toString()
+}
+
+/**
+ * A custom diagnostic payload used to verify that [Result] can hold arbitrary error types
+ * and preserve object identity across language boundaries.
+ */
+public class CustomDiagnostic(
+    public val code: Int,
+    public val message: String,
+) {
+    override fun toString(): String = "CustomDiagnostic(code=$code, message=$message)"
 }
 
 /**
@@ -50,6 +63,8 @@ public class Error internal constructor(
     override fun source(): StdError? = errorSource(this)
 
     override fun toString(): String = display(inner.byRef(), alternate = false)
+
+    override fun debugString(alternate: Boolean): String = debug(inner.byRef(), alternate = alternate)
 
     public companion object
 }

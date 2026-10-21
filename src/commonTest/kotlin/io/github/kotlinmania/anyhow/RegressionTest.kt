@@ -26,11 +26,6 @@ class RegressionTest {
 
     // 2. Custom E in generic Result contract: Result<T, E> can hold an arbitrary
     // non-Throwable, non-StdError error type E.
-    private data class CustomDiagnostic(
-        val code: Int,
-        val message: String,
-    )
-
     @Test
     fun testCustomErrorTypeInResult() {
         val diag = CustomDiagnostic(404, "resource missing")
@@ -118,6 +113,15 @@ class RegressionTest {
         assertTrue(debug.contains("failed to connect to host"), "Debug must contain context")
         assertTrue(debug.contains("Caused by:"), "Debug must contain Caused by:")
         assertTrue(debug.contains("connection refused"), "Debug must contain root cause")
+
+        // Alternate Debug renders structured Error { context: ..., source: ... }
+        val altDebug = err.debugString(alternate = true)
+        val expectedAltDebug =
+            "Error {\n" +
+                "    context: \"failed to connect to host\",\n" +
+                "    source: connection refused,\n" +
+                "}"
+        assertEquals(expectedAltDebug, altDebug)
     }
 
     // 5. Result.context() bound and cause preservation:
@@ -135,5 +139,42 @@ class RegressionTest {
         assertEquals("higher level step", outerErr.displayString(alternate = false))
         assertEquals("higher level step: inner failure", outerErr.displayString(alternate = true))
         assertSame(root, outerErr.downcastRef<RootCause>())
+    }
+
+    // 6. Throwable identity preservation through anyhow() and context downcasting.
+    // Unwraps the original Throwable instance instead of exposing ThrowableStdError wrapper.
+    @Test
+    fun testThrowableDowncastIdentity() {
+        val original = IllegalArgumentException("custom invalid argument")
+        val err = anyhow(original)
+
+        // Downcast to exact type
+        val downcasted = err.downcastRef<IllegalArgumentException>()
+        assertNotNull(downcasted)
+        assertSame(original, downcasted)
+        assertTrue(err.isType(IllegalArgumentException::class))
+
+        // Downcast to supertype Throwable
+        val downcastedThrowable = err.downcastRef<Throwable>()
+        assertNotNull(downcastedThrowable)
+        assertSame(original, downcastedThrowable)
+        assertTrue(err.isType(Throwable::class))
+
+        // Preserved through context wrapping
+        val withContext = err.context("higher level context")
+        val downcastedThroughContext = withContext.downcastRef<IllegalArgumentException>()
+        assertNotNull(downcastedThroughContext)
+        assertSame(original, downcastedThroughContext)
+        assertTrue(withContext.isType(IllegalArgumentException::class))
+
+        val downcastedOuterContext = withContext.downcastRef<String>()
+        assertEquals("higher level context", downcastedOuterContext)
+
+        // Preserved through multiple context layers
+        val withTwoContexts = withContext.context("outermost context")
+        val downcastedThroughTwoContexts = withTwoContexts.downcastRef<IllegalArgumentException>()
+        assertNotNull(downcastedThroughTwoContexts)
+        assertSame(original, downcastedThroughTwoContexts)
+        assertTrue(withTwoContexts.isType(IllegalArgumentException::class))
     }
 }

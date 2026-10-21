@@ -5,6 +5,35 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class FmtDisplayTest {
+    companion object {
+        private const val EXPECTED_ALTDEBUG_F: String =
+            "Custom {\n" +
+                "    kind: PermissionDenied,\n" +
+                "    error: \"oh no!\",\n" +
+                "}"
+
+        private const val EXPECTED_ALTDEBUG_G: String =
+            "Error {\n" +
+                "    context: \"f failed\",\n" +
+                "    source: Custom {\n" +
+                "        kind: PermissionDenied,\n" +
+                "        error: \"oh no!\",\n" +
+                "    },\n" +
+                "}"
+
+        private const val EXPECTED_ALTDEBUG_H: String =
+            "Error {\n" +
+                "    context: \"g failed\",\n" +
+                "    source: Error {\n" +
+                "        context: \"f failed\",\n" +
+                "        source: Custom {\n" +
+                "            kind: PermissionDenied,\n" +
+                "            error: \"oh no!\",\n" +
+                "        },\n" +
+                "    },\n" +
+                "}"
+    }
+
     private fun f(): Result<Unit, Error> = bail(TestIoError("oh no!"))
 
     private fun g(): Result<Unit, Error> = f().context("f failed")
@@ -43,6 +72,17 @@ class FmtDisplayTest {
         val debugH = errH.debugString(alternate = false)
         val expectedH = "g failed\n\nCaused by:\n    0: f failed\n    1: oh no!"
         assertEquals(expectedH, stripBacktrace(debugH))
+    }
+
+    @Test
+    fun testAltDebug() {
+        val errF = f().exceptionOrNull() as Error
+        val errG = g().exceptionOrNull() as Error
+        val errH = h().exceptionOrNull() as Error
+
+        assertEquals(EXPECTED_ALTDEBUG_F, errF.debugString(alternate = true))
+        assertEquals(EXPECTED_ALTDEBUG_G, errG.debugString(alternate = true))
+        assertEquals(EXPECTED_ALTDEBUG_H, errH.debugString(alternate = true))
     }
 
     private fun stripBacktrace(s: String): String {
