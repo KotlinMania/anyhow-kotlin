@@ -294,3 +294,12 @@ checks.
 The shared helper matches Libc PR135's tested implementation; exact-head compiler/link/runtime
 receipts remain necessary for each project and target. The focused Android sync
 route does not rewrite existing FFI specialization or apply this change to a fleet.
+
+
+## Chain iteration parity (2026-11-02)
+
+The fresh `chain.rs` translation and direct source comparison retain Rust's optional next item. `Chain.nextOrNull()` exposes that behavior as a nullable StdError in Kotlin, including stable exhaustion in linked and buffered states. Kotlin's required `Iterator.next()` boundary instead throws NoSuchElementException when empty; Rust itself returns None. No general compiler Iterator/Option lowering or ownership/lifetime redesign is claimed.
+
+The step algorithm remains lazy, preserves source callback order and propagates callback failures without losing the current item. Mixed front/back traversal and clones retain the same error references with independent iterator state. The unchanged upstream Anyhow 1.0.101 path dependency is exercised by `verification/chain-oracle` using locked offline Cargo.
+
+Validation: 64 JVM tests, 64 macOS ARM64 tests, six Rust oracle tests and global ktlint pass. Detekt reports existing ClassNaming findings for `ext` in Context.kt and `__private` in ErrorContext.kt; neither file nor lint configuration was changed. Other targets and no-std source profiles remain unverified. The missing canonical thiserror 0.2.2 test dependency was declared separately in 8fdd5d2; the 52 prior dirty status entries (97 files) were checkpointed as 8c28c13, not counted as new source parity coverage.

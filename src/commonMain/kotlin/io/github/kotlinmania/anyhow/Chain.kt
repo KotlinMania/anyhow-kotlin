@@ -39,21 +39,24 @@ public class Chain internal constructor(
             is ChainState.Buffered -> s.rest.isNotEmpty()
         }
 
-    override fun next(): Item = next(this)
+    override fun next(): Item = next(this) ?: throw NoSuchElementException()
+
+    /** Returns the next source error, or null once the chain is exhausted. */
+    public fun nextOrNull(): StdError? = next(this)
 
     public companion object
 }
 
-internal fun next(chain: Chain): Item =
+internal fun next(chain: Chain): Item? =
     when (val s = chain.state) {
         is ChainState.Linked -> {
-            val error = checkNotNull(s.next)
-            s.next = error.source()
+            val error = s.next
+            if (error != null) s.next = error.source()
             error
         }
 
         is ChainState.Buffered -> {
-            s.rest.removeFirst()
+            s.rest.removeFirstOrNull()
         }
     }
 
