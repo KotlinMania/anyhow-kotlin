@@ -27,8 +27,11 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "collectionsImmutable" }
 kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlinxBenchmark" }
 
+thiserror-kotlin = { module = "io.github.kotlinmania:thiserror-kotlin", version = "0.2.2" }
+
 [bundles]
 anyhow-commonMain = [
   "kotlinx-coroutines-core",
   "collections-immutable",
 ]
+anyhow-commonTest = ["thiserror-kotlin"]
