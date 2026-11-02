@@ -5,9 +5,9 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 11/12 (91.7%)
-- **Function parity:** 142/142 matched (target 202) — 100.0%
-- **Class/type parity:** 37/37 matched (target 53) — 100.0%
-- **Combined symbol parity:** 179/179 matched (target 255) — 100.0%
+- **Function parity:** 142/142 matched (target 213) — 100.0%
+- **Class/type parity:** 37/37 matched (target 55) — 100.0%
+- **Combined symbol parity:** 179/179 matched (target 268) — 100.0%
 - **Average inline-code cosine:** 0.20 (function body across 11 matched files)
 - **Average documentation cosine:** 0.15 (doc text across 11 matched files)
 - **Cheat-zeroed Files:** 1
@@ -31,11 +31,11 @@ Every matched file is listed below with function and type symbol parity.
 
 ### 1. error
 
-- **Target:** `anyhow.Error`
+- **Target:** `anyhow.StdError`
 - **Similarity:** 0.26
 - **Dependents:** 3
 - **Priority Score:** 3005907.5
-- **Functions:** 55/55 matched (target 77)
+- **Functions:** 55/55 matched (target 78)
 - **Missing functions:** _none_
 - **Types:** 4/4 matched (target 5)
 - **Missing types:** _none_
@@ -70,7 +70,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Priority Score:** 2000907.5
 - **Functions:** 6/6 matched (target 9)
 - **Missing functions:** _none_
-- **Types:** 3/3 matched (target 5)
+- **Types:** 3/3 matched (target 6)
 - **Missing types:** _none_
 
 ### 5. fmt
@@ -79,7 +79,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Similarity:** 0.29
 - **Dependents:** 1
 - **Priority Score:** 1000707.1
-- **Functions:** 6/6 matched
+- **Functions:** 6/6 matched (target 7)
 - **Missing functions:** _none_
 - **Types:** 1/1 matched (target 2)
 - **Missing types:** _none_
@@ -91,9 +91,9 @@ Every matched file is listed below with function and type symbol parity.
 - **Similarity:** 0.21
 - **Dependents:** 0
 - **Priority Score:** 1707.9
-- **Functions:** 14/14 matched (target 23)
+- **Functions:** 14/14 matched (target 33)
 - **Missing functions:** _none_
-- **Types:** 3/3 matched (target 7)
+- **Types:** 3/3 matched (target 8)
 - **Missing types:** _none_
 
 ### 7. kind
@@ -113,7 +113,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Similarity:** 0.12
 - **Dependents:** 0
 - **Priority Score:** 1108.8
-- **Functions:** 8/8 matched (target 12)
+- **Functions:** 8/8 matched (target 13)
 - **Missing functions:** _none_
 - **Types:** 3/3 matched
 - **Missing types:** _none_
@@ -132,10 +132,10 @@ Every matched file is listed below with function and type symbol parity.
 ### 10. nightly
 
 - **Target:** `anyhow.Nightly`
-- **Similarity:** 0.31
+- **Similarity:** 0.30
 - **Dependents:** 0
-- **Priority Score:** 806.9
-- **Functions:** 7/7 matched (target 13)
+- **Priority Score:** 807.0
+- **Functions:** 7/7 matched (target 11)
 - **Missing functions:** _none_
 - **Types:** 1/1 matched (target 3)
 - **Missing types:** _none_
