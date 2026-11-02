@@ -98,3 +98,80 @@ mod tests {
         assert!(chain.next().is_none());
     }
 }
+
+#[cfg(test)]
+mod quote_tests {
+    use std::error::Error;
+    use std::fmt;
+
+    #[derive(Debug)]
+    struct Leaf;
+    impl fmt::Display for Leaf {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { f.write_str("leaf") }
+    }
+    impl Error for Leaf {}
+
+    #[test]
+    fn ascii_string_and_character_escape_tables() {
+        for byte in 0u8..=127 {
+            let c = byte as char;
+            println!("STR|{byte:03}|{}", c.to_string().escape_debug());
+            println!("CHAR|{byte:03}|{}", c.escape_debug());
+        }
+        assert_eq!("'".escape_debug().to_string(), "\\'");
+        assert_eq!('\''.escape_debug().to_string(), "\\'");
+        assert_eq!("\0".escape_debug().to_string(), "\\0");
+    }
+    #[test]
+    fn actual_context_debug_ascii_fixtures() {
+        for (index, context) in ["O'Reilly", "\0", "\"\\\n\t\r", "a'b\0c"].into_iter().enumerate() {
+            let error = anyhow::Error::new(Leaf).context(context);
+            let debug = format!("{error:#?}");
+            let hex: String = debug.as_bytes().iter().map(|b| format!("{b:02x}")).collect();
+            println!("PRETTY|{index}|{hex}");
+            assert!(debug.starts_with("Error {\n    context: \""));
+            assert!(debug.ends_with("source: Leaf,\n}"));
+        }
+    }
+}
+
+#[cfg(test)]
+mod result_context_tests {
+    use anyhow::Context;
+    use std::cell::Cell;
+    use std::error::Error;
+    use std::fmt;
+
+    #[derive(Debug)]
+    struct Leaf;
+    impl fmt::Display for Leaf {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { f.write_str("leaf") }
+    }
+    impl Error for Leaf {}
+
+    #[test]
+    fn optional_success_does_not_evaluate_context() {
+        let calls = Cell::new(0);
+        let input: Result<Option<u8>, Leaf> = Ok(None);
+        let result = input.with_context(|| { calls.set(calls.get() + 1); "unused" });
+        assert_eq!(result.unwrap(), None);
+        assert_eq!(calls.get(), 0);
+    }
+    #[test]
+    fn failure_runs_supplier_once_and_preserves_original_error() {
+        let calls = Cell::new(0);
+        let input: Result<(), Leaf> = Err(Leaf);
+        let error = input.with_context(|| { calls.set(calls.get() + 1); "outer" }).unwrap_err();
+        assert_eq!(calls.get(), 1);
+        assert_eq!(error.to_string(), "outer");
+        assert!(error.downcast_ref::<Leaf>().is_some());
+    }
+    #[test]
+    fn supplier_panic_propagates() {
+        let result = std::panic::catch_unwind(|| {
+            let input: Result<(), Leaf> = Err(Leaf);
+            input.with_context(|| -> &'static str { panic!("context failure") })
+        });
+        assert!(result.is_err());
+    }
+}

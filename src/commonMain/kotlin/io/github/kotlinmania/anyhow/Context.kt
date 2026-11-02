@@ -60,25 +60,17 @@ public fun <T, E : Throwable> Result<T, E>.withContext(context: ContextSupplier)
 public inline fun <T, E : Throwable> Result<T, E>.withContext(crossinline context: () -> Any): Result<T, Error> =
     withContext(ContextSupplier { context() })
 
-public fun <T> kotlin.Result<T>.context(context: Any): Result<T, Error> {
-    val ok = getOrNull()
-    if (ok != null || isSuccess) {
-        return Result.ok(getOrThrow())
-    }
+public fun <T> kotlin.Result<T>.context(context: Any): Result<T, Error> =
+    fold(
+        onSuccess = { Result.ok(it) },
+        onFailure = { Result.err(it.extContext(context)) },
+    )
 
-    val error = exceptionOrNull() ?: return Result.err(anyhow("unknown failure"))
-    return Result.err(error.extContext(context))
-}
-
-public fun <T> kotlin.Result<T>.withContext(context: ContextSupplier): Result<T, Error> {
-    val ok = getOrNull()
-    if (ok != null || isSuccess) {
-        return Result.ok(getOrThrow())
-    }
-
-    val error = exceptionOrNull() ?: return Result.err(anyhow("unknown failure"))
-    return Result.err(error.extContext(context()))
-}
+public fun <T> kotlin.Result<T>.withContext(context: ContextSupplier): Result<T, Error> =
+    fold(
+        onSuccess = { Result.ok(it) },
+        onFailure = { Result.err(it.extContext(context())) },
+    )
 
 public inline fun <T> kotlin.Result<T>.withContext(crossinline context: () -> Any): Result<T, Error> =
     withContext(ContextSupplier { context() })
@@ -182,6 +174,7 @@ internal fun String.escapeDebug(): String {
 
 internal fun Char.escapeDebug(): String =
     when (this) {
+        '\u0000' -> "\\0"
         '\t' -> "\\t"
         '\r' -> "\\r"
         '\n' -> "\\n"

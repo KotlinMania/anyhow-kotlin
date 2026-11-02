@@ -303,3 +303,12 @@ The fresh `chain.rs` translation and direct source comparison retain Rust's opti
 The step algorithm remains lazy, preserves source callback order and propagates callback failures without losing the current item. Mixed front/back traversal and clones retain the same error references with independent iterator state. The unchanged upstream Anyhow 1.0.101 path dependency is exercised by `verification/chain-oracle` using locked offline Cargo.
 
 Validation: 64 JVM tests, 64 macOS ARM64 tests, six Rust oracle tests and global ktlint pass. Detekt reports existing ClassNaming findings for `ext` in Context.kt and `__private` in ErrorContext.kt; neither file nor lint configuration was changed. Other targets and no-std source profiles remain unverified. The missing canonical thiserror 0.2.2 test dependency was declared separately in 8fdd5d2; the 52 prior dirty status entries (97 files) were checkpointed as 8c28c13, not counted as new source parity coverage.
+
+
+## Context ASCII quoting and Result adapters (2026-11-02)
+
+A fresh context.rs translation and unchanged upstream Anyhow/std oracle establish the ASCII quoting profile. NUL is encoded as `\0`, not `\u{0}`. Apostrophes remain escaped, as Rust's explicit str::escape_debug and char::escape_debug both require. The frozen 128-entry ASCII table was captured from real Rust output and is checked through both Kotlin helpers, along with actual public context debug fixtures.
+
+The kotlin.Result context/withContext adapters use exhaustive fold callbacks rather than manufacturing an unreachable "unknown failure" error. Nullable success, lazy supplier counts, original Throwable identity and supplier exception propagation remain intact. The three quoting regressions fail before repair; the three Result tests already pass before the behavior-preserving cleanup.
+
+Validation: 70 JVM tests, 70 macOS ARM64 tests, 11 locked offline Rust oracle tests and ktlint pass. The same two ClassNaming declarations (`ext` and `__private`) remain reported by Detekt and were not changed. Broader Unicode printability/grapheme/supplementary escaping, generic MessageError Debug-versus-Display behavior, other targets and general compiler trait lowering are outside this slice. Kotlin's iterator adapter remains distinct from Rust nullable advancement as described above. No dependency pins changed.
