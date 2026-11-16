@@ -2,6 +2,7 @@
 
 package io.github.kotlinmania.anyhow
 
+@Suppress("ClassNaming")
 internal object ext {
     internal interface StdError {
         fun extContext(context: Any): Error

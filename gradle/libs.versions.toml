@@ -30,7 +30,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "collectionsImmutable" }
 kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlinxBenchmark" }
 
-thiserror-kotlin = { module = "io.github.kotlinmania:thiserror-kotlin", version = "0.2.2" }
+thiserror-kotlin = { module = "io.github.kotlinmania:thiserror-kotlin", version = "0.2.1" }
 
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
 

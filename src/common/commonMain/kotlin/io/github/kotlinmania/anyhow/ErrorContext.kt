@@ -188,6 +188,7 @@ internal fun not(cond: Bool): Boolean = cond.not()
 internal fun not(cond: Boolean): Boolean = !cond
 
 // Not public API. Used by the [anyhow], [bail], and [ensure] helpers.
+@Suppress("ClassNaming")
 public object __private {
     public fun formatErr(message: String): Error = Error.msg(message)
 
