@@ -14,14 +14,12 @@ potential-bugs:
   EqualsWithHashCodeExist: { active: false }
   ExplicitGarbageCollectionCall: { active: true }
   LateinitUsage: { active: true }
-  NullCheckOnMutableProperty: { active: false }
+  NullCheckOnMutableProperty: { active: true }
   UnreachableCode: { active: true }
   WrongEqualsTypeParameter: { active: false }
   UnsafeCallOnNullableType: { active: false }
   UnnecessaryNotNullOperator: { active: false }
   ImplicitDefaultLocale: { active: false }
-  IteratorNotThrowingNoSuchElementException: { active: false }
-  IgnoredReturnValue: { active: false }
 
 performance:
   active: true
@@ -35,7 +33,7 @@ style:
   UnusedImport: { active: true }
   UnnecessaryInheritance: { active: true }
   UtilityClassWithPublicConstructor: { active: true }
-  DestructuringDeclarationWithTooManyEntries: { active: false }
+  DestructuringDeclarationWithTooManyEntries: { active: true, maxDestructuringEntries: 3 }
   ProtectedMemberInFinalClass: { active: false }
   MaxLineLength: { active: false }
   UseCheckOrError: { active: false }
@@ -50,13 +48,7 @@ style:
   UnusedPrivateProperty: { active: false }
   RedundantVisibilityModifier: { active: false }
   AbstractClassCanBeInterface: { active: false }
-  VarCouldBeVal: { active: false }
-  UseOrEmpty: { active: false }
-  UseIsNullOrEmpty: { active: false }
-  NestedClassesVisibility: { active: false }
-  UnnecessaryFilter: { active: false }
-  UnusedPrivateFunction: { active: false }
-  UnusedVariable: { active: false }
+  AbstractClassCanBeConcreteClass: { active: false }
 
 complexity:
   active: true
@@ -88,7 +80,7 @@ naming:
   active: true
   TopLevelPropertyNaming: { active: false }
   FunctionNaming: { active: false }
-  ClassNaming: { active: true, classPattern: '[A-Za-z0-9_]+' }
+  ClassNaming: { active: true }
   EnumNaming: { active: true }
   VariableNaming: { active: false }
   ConstructorParameterNaming: { active: false }
@@ -96,7 +88,6 @@ naming:
   MatchingDeclarationName: { active: false }
   ObjectPropertyNaming: { active: false }
   MemberNameEqualsClassName: { active: false }
-  NoNameShadowing: { active: false }
 
 exceptions:
   active: true

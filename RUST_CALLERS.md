@@ -16,15 +16,15 @@ For every Rust crate this repo owns (under `tmp/`), this file lists every **cros
 
 | package | module | inbound use sites | distinct caller crates | distinct caller repos | codex sites |
 |---|---|---:|---:|---:|---:|
-| `anyhow` | `anyhow` | 628 | 68 | 15 | 489 |
+| `anyhow` | `anyhow` | 1088 | 94 | 26 | 489 |
 
 ## `anyhow`
 
-### Inbound symbols (8 distinct, 628 total `use` sites)
+### Inbound symbols (8 distinct, 1088 total `use` sites)
 
 Sorted by codex demand, then total demand. The first symbols are the priority queue for porting `anyhow`.
 
-#### `anyhow::Result` — 322 site(s) (272 codex, 50 other, 47 caller crates)
+#### `anyhow::Result` — 576 site(s) (272 codex, 304 other, 70 caller crates)
 
 - ✅ `codex-kotlin/app_test_support` `analytics_server.rs:1` — `use anyhow::Result`
 - ✅ `codex-kotlin/app_test_support` `auth_fixtures.rs:4` — `use anyhow::Result`
@@ -38,9 +38,9 @@ Sorted by codex demand, then total demand. The first symbols are the priority qu
 - ✅ `codex-kotlin/codex-app-server` `src/config_manager_service_tests.rs:2` — `use anyhow::Result`
 - ✅ `codex-kotlin/codex-app-server` `src/message_processor_tracing_tests.rs:10` — `use anyhow::Result`
 - ✅ `codex-kotlin/codex-app-server` `src/request_processors/thread_processor_tests.rs:51` — `use anyhow::Result`
-- _… and 310 more site(s)._
+- _… and 564 more site(s)._
 
-#### `anyhow::Context` — 163 site(s) (124 codex, 39 other, 49 caller crates)
+#### `anyhow::Context` — 188 site(s) (124 codex, 64 other, 57 caller crates)
 
 - ✅ `codex-kotlin/app_test_support` `auth_fixtures.rs:2` — `use anyhow::Context`
 - ✅ `codex-kotlin/app_test_support` `mcp_process.rs:12` — `use anyhow::Context`
@@ -54,9 +54,9 @@ Sorted by codex demand, then total demand. The first symbols are the priority qu
 - ✅ `codex-kotlin/codex-app-server` `tests/suite/v2/dynamic_tools.rs:1` — `use anyhow::Context`
 - ✅ `codex-kotlin/codex-app-server` `tests/suite/v2/fs.rs:1` — `use anyhow::Context`
 - ✅ `codex-kotlin/codex-app-server` `tests/suite/v2/marketplace_remove.rs:2` — `use anyhow::Context`
-- _… and 151 more site(s)._
+- _… and 176 more site(s)._
 
-#### `anyhow::anyhow` — 61 site(s) (44 codex, 17 other, 25 caller crates)
+#### `anyhow::anyhow` — 73 site(s) (44 codex, 29 other, 33 caller crates)
 
 - ✅ `codex-kotlin/codex-app-server` `src/bespoke_event_handling.rs:2089` — `use anyhow::anyhow`
 - ✅ `codex-kotlin/codex-app-server` `src/bin/notify_capture.rs:9` — `use anyhow::anyhow`
@@ -70,9 +70,9 @@ Sorted by codex demand, then total demand. The first symbols are the priority qu
 - ✅ `codex-kotlin/codex-core` `src/guardian/review_session.rs:6` — `use anyhow::anyhow`
 - ✅ `codex-kotlin/codex-core` `src/shell_snapshot.rs:15` — `use anyhow::anyhow`
 - ✅ `codex-kotlin/codex-core` `src/turn_diff_tracker.rs:9` — `use anyhow::anyhow`
-- _… and 49 more site(s)._
+- _… and 61 more site(s)._
 
-#### `anyhow::bail` — 51 site(s) (34 codex, 17 other, 14 caller crates)
+#### `anyhow::bail` — 72 site(s) (34 codex, 38 other, 19 caller crates)
 
 - ✅ `codex-kotlin/codex-app-server` `src/bespoke_event_handling.rs:2090` — `use anyhow::bail`
 - ✅ `codex-kotlin/codex-app-server` `src/bin/notify_capture.rs:10` — `use anyhow::bail`
@@ -86,9 +86,9 @@ Sorted by codex demand, then total demand. The first symbols are the priority qu
 - ✅ `codex-kotlin/codex-app-server` `tests/suite/v2/plugin_uninstall.rs:4` — `use anyhow::bail`
 - ✅ `codex-kotlin/codex-app-server-test-client` `src/lib.rs:24` — `use anyhow::bail`
 - ✅ `codex-kotlin/codex-cli` `src/marketplace_cmd.rs:3` — `use anyhow::bail`
-- _… and 39 more site(s)._
+- _… and 60 more site(s)._
 
-#### `anyhow::ensure` — 11 site(s) (7 codex, 4 other, 7 caller crates)
+#### `anyhow::ensure` — 13 site(s) (7 codex, 6 other, 9 caller crates)
 
 - ✅ `codex-kotlin/codex-arg0` `src/lib.rs:465` — `use anyhow::ensure`
 - ✅ `codex-kotlin/codex-core` `tests/common/lib.rs:4` — `use anyhow::ensure`
@@ -100,33 +100,43 @@ Sorted by codex demand, then total demand. The first symbols are the priority qu
 - `portable-pty-kotlin/portable-pty` `src/serial.rs:12` — `use anyhow::ensure`
 - `portable-pty-kotlin/portable-pty` `src/win/procthreadattr.rs:2` — `use anyhow::ensure`
 - `portable-pty-kotlin/portable-pty` `src/win/psuedocon.rs:4` — `use anyhow::ensure`
-- `runfiles-kotlin/cargo-bazel` `tests/cargo_integration_test.rs:11` — `use anyhow::ensure`
+- `pyo3-kotlin/pyo3` `pyo3-introspection/src/introspection.rs:5` — `use anyhow::ensure`
+- `pyo3-kotlin/pyo3-introspection` `src/introspection.rs:5` — `use anyhow::ensure`
+- _… and 1 more site(s)._
 
-#### `anyhow::Error` — 10 site(s) (5 codex, 5 other, 3 caller crates)
+#### `anyhow::Error` — 147 site(s) (5 codex, 142 other, 8 caller crates)
 
 - ✅ `codex-kotlin/codex-rmcp-client` `src/auth_status.rs:3` — `use anyhow::Error`
 - ✅ `codex-kotlin/codex-rmcp-client` `src/oauth.rs:20` — `use anyhow::Error`
 - ✅ `codex-kotlin/codex-utils-pty` `src/win/conpty.rs:22` — `use anyhow::Error`
 - ✅ `codex-kotlin/codex-utils-pty` `src/win/procthreadattr.rs:22` — `use anyhow::Error`
 - ✅ `codex-kotlin/codex-utils-pty` `src/win/psuedocon.rs:24` — `use anyhow::Error`
-- `portable-pty-kotlin/portable-pty` `src/lib.rs:1` — `use anyhow::Error`
-- `portable-pty-kotlin/portable-pty` `src/unix.rs:4` — `use anyhow::Error`
-- `portable-pty-kotlin/portable-pty` `src/win/conpty.rs:4` — `use anyhow::Error`
-- `portable-pty-kotlin/portable-pty` `src/win/procthreadattr.rs:2` — `use anyhow::Error`
-- `portable-pty-kotlin/portable-pty` `src/win/psuedocon.rs:4` — `use anyhow::Error`
+- `candle-kotlin/candle-examples` `examples/based/main.rs:6` — `use anyhow::Error as E`
+- `candle-kotlin/candle-examples` `examples/bert/main.rs:7` — `use anyhow::Error as E`
+- `candle-kotlin/candle-examples` `examples/bert_single_file_binary/main.rs:7` — `use anyhow::Error as E`
+- `candle-kotlin/candle-examples` `examples/bigcode/main.rs:6` — `use anyhow::Error as E`
+- `candle-kotlin/candle-examples` `examples/blip/main.rs:6` — `use anyhow::Error as E`
+- `candle-kotlin/candle-examples` `examples/chatglm/main.rs:6` — `use anyhow::Error as E`
+- `candle-kotlin/candle-examples` `examples/clip/main.rs:6` — `use anyhow::Error as E`
+- _… and 135 more site(s)._
 
-#### `anyhow::Ok` — 9 site(s) (3 codex, 6 other, 3 caller crates)
+#### `anyhow::Ok` — 17 site(s) (3 codex, 14 other, 5 caller crates)
 
 - ✅ `codex-kotlin/codex-core` `tests/suite/deprecation_notice.rs:2` — `use anyhow::Ok`
 - ✅ `codex-kotlin/codex-core` `tests/suite/items.rs:2` — `use anyhow::Ok`
 - ✅ `codex-kotlin/codex-rollout-trace` `src/reducer/conversation.rs:9` — `use anyhow::Ok`
+- `candle-kotlin/candle-examples` `examples/stable-diffusion-3/clip.rs:1` — `use anyhow::Ok`
+- `candle-kotlin/candle-examples` `examples/stable-diffusion-3/main.rs:10` — `use anyhow::Ok`
+- `candle-kotlin/candle-examples` `examples/stable-diffusion-3/sampling.rs:1` — `use anyhow::Ok`
+- `candle-kotlin/candle-examples` `examples/stable-diffusion-3/vae.rs:1` — `use anyhow::Ok`
+- `candle-ug-kotlin/candle-examples` `examples/stable-diffusion-3/clip.rs:1` — `use anyhow::Ok`
+- `candle-ug-kotlin/candle-examples` `examples/stable-diffusion-3/main.rs:10` — `use anyhow::Ok`
+- `candle-ug-kotlin/candle-examples` `examples/stable-diffusion-3/sampling.rs:1` — `use anyhow::Ok`
+- `candle-ug-kotlin/candle-examples` `examples/stable-diffusion-3/vae.rs:1` — `use anyhow::Ok`
 - `libwebrtc-kotlin/livekit` `tests/audio_test.rs:16` — `use anyhow::Ok`
-- `libwebrtc-kotlin/livekit` `tests/data_channel_encryption.rs:16` — `use anyhow::Ok`
-- `libwebrtc-kotlin/livekit` `tests/data_channel_test.rs:16` — `use anyhow::Ok`
-- `libwebrtc-kotlin/livekit` `tests/data_stream_test.rs:16` — `use anyhow::Ok`
-- `libwebrtc-kotlin/livekit` `tests/room_test.rs:16` — `use anyhow::Ok`
-- `libwebrtc-kotlin/livekit` `tests/video_test.rs:16` — `use anyhow::Ok`
+- _… and 5 more site(s)._
 
-#### `anyhow` — 1 site(s) (0 codex, 1 other, 1 caller crates)
+#### `anyhow` — 2 site(s) (0 codex, 2 other, 2 caller crates)
 
 - `starlark-kotlin/pagable` `src/lib.rs:42` — `pub_use anyhow`
+- `vergen-kotlin/vergen` `src/lib.rs:525` — `use anyhow as _`
